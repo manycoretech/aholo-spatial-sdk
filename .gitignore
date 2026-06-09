@@ -1,0 +1,34 @@
+# Node.js
+node_modules/
+dist/
+package-lock.json
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+build/
+.venv/
+venv/
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Internal docs
+SDK-UPDATE-GUIDE.md
+SDK-PUBLISH-GUIDE.md

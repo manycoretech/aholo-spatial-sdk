@@ -1,0 +1,37 @@
+{
+  "name": "@manycore/aholo-sdk-core",
+  "version": "1.1.0",
+  "description": "Aholo Open API shared HTTP client, errors, and polling utilities",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manycoretech/aholo-spatial-sdk.git"
+  },
+  "homepage": "https://github.com/manycoretech/aholo-spatial-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/manycoretech/aholo-spatial-sdk/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
+}

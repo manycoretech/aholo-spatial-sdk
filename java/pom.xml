@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.manycoreapis</groupId>
+    <artifactId>aholo-sdk-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    <name>Aholo SDK Parent</name>
+    <description>Official Java SDK for the Aholo Open API</description>
+    <url>https://github.com/manycoretech/aholo-spatial-sdk</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Manycore Technology</name>
+            <email>devops-team@qunhemail.com</email>
+            <organization>Manycore Technology</organization>
+            <organizationUrl>https://manycoretech.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/manycoretech/aholo-spatial-sdk.git</connection>
+        <developerConnection>scm:git:ssh://github.com/manycoretech/aholo-spatial-sdk.git</developerConnection>
+        <url>https://github.com/manycoretech/aholo-spatial-sdk</url>
+    </scm>
+
+    <modules>
+        <module>aholo-sdk-core</module>
+        <module>aholo-sdk-asset</module>
+        <module>aholo-sdk-world</module>
+        <module>aholo-sdk-lux3d</module>
+        <module>examples</module>
+    </modules>
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jackson.version>2.18.2</jackson.version>
+        <!-- Independent version for aholo-sdk-core; update here when core changes. -->
+        <aholo.sdk.core.version>1.1.0</aholo.sdk.core.version>
+    </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.manycoreapis</groupId>
+                <artifactId>aholo-sdk-core</artifactId>
+                <version>${aholo.sdk.core.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <release>${maven.compiler.release}</release>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.3.1</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals><goal>jar-no-fork</goal></goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.10.1</version>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals><goal>jar</goal></goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <!--
+      Maven Central publishing via Sonatype Central Portal.
+      Prerequisites:
+        1. Register at https://central.sonatype.com and claim com.manycoreapis group
+        2. Generate a deployment token (User Token) from the portal
+        3. Add to ~/.m2/settings.xml:
+             <server>
+               <id>central</id>
+               <username>YOUR_TOKEN_USERNAME</username>
+               <password>YOUR_TOKEN_PASSWORD</password>
+             </server>
+        4. Set up GPG key and publish to a keyserver (e.g. keys.openpgp.org)
+      Usage:
+        mvn clean deploy -P release -pl aholo-sdk-core,aholo-sdk-asset,aholo-sdk-world,aholo-sdk-lux3d -am
+    -->
+    <profiles>
+        <profile>
+            <id>release</id>
+            <distributionManagement>
+                <repository>
+                    <id>central</id>
+                    <url>https://central.sonatype.com/api/v1/publisher/upload</url>
+                </repository>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.7</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals><goal>sign</goal></goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.6.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- Activated by publish.sh when GPG_PASSPHRASE is set (non-interactive signing). -->
+        <profile>
+            <id>gpg-loopback</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <configuration>
+                            <passphrase>${gpg.passphrase}</passphrase>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

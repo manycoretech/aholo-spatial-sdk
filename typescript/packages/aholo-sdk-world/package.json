@@ -1,0 +1,41 @@
+{
+  "name": "@manycore/aholo-sdk-world",
+  "version": "1.1.0",
+  "description": "Aholo 3DGS world reconstruction and generation client",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manycoretech/aholo-spatial-sdk.git"
+  },
+  "homepage": "https://github.com/manycoretech/aholo-spatial-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/manycoretech/aholo-spatial-sdk/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "generate": "openapi-typescript \"${WORLD_OPENAPI_SPEC:?Set WORLD_OPENAPI_SPEC to the path of world openapi.yaml}\" -o src/generated/world-api.ts"
+  },
+  "dependencies": {
+    "@manycore/aholo-sdk-core": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
+}
