@@ -16,6 +16,7 @@ venv/
 
 # Java / Maven
 target/
+.flattened-pom.xml
 *.class
 *.jar
 *.war

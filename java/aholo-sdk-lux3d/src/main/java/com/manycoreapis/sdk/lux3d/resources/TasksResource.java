@@ -8,6 +8,7 @@ import com.manycoreapis.sdk.core.PollSupport;
 import com.manycoreapis.sdk.lux3d.model.TaskResult;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Map;
 
 /** Lux3D task query and polling resource. */
@@ -29,13 +30,13 @@ public class TasksResource {
         Map<String, Object> body = gateway.gatewayRequest(
                 "GET",
                 pathPrefix + "/generate/task/get",
-                Map.of("taskid", String.valueOf(taskId)),
+                Collections.<String, Object>singletonMap("taskid", String.valueOf(taskId)),
                 null,
                 null
         );
         CmdSupport.assertCmdOk(body, "get task");
         Object data = body.get("d");
-        if (!(data instanceof Map<?, ?>)) {
+        if (!(data instanceof Map)) {
             throw new BusinessException("Lux3D task query returned no data",
                     body.get("c") == null ? null : String.valueOf(body.get("c")), body);
         }

@@ -6,7 +6,7 @@ Official Java SDKs for the [Aholo](https://labs.aholo3d.com) Open API.
 
 > 📖 **Full documentation (canonical)**: [https://labs.aholo3d.com/api-docs/en/sdk/java](https://labs.aholo3d.com/api-docs/en/sdk/java)
 
-**Requirements:** Java ≥ 17, Maven ≥ 3.6
+**Requirements:** Java 8+, Maven ≥ 3.6 (build with JDK 17 or 21 recommended)
 
 ## Packages
 

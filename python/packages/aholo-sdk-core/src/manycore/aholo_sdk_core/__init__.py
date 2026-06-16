@@ -16,10 +16,15 @@ from .errors import (
     assert_cmd_ok,
     assert_cmd_success,
 )
-from .gateway_client import AholoGatewayClient, create_gateway_client
-from .http import BaseHttpClient
-from .ous_client import OUS_TOKEN_HEADER, OusHttpClient
-from .poll import poll_until
+from .gateway_client import (
+    AholoGatewayClient,
+    AsyncAholoGatewayClient,
+    create_async_gateway_client,
+    create_gateway_client,
+)
+from .http import AsyncBaseHttpClient, BaseHttpClient
+from .ous_client import OUS_TOKEN_HEADER, AsyncOusHttpClient, OusHttpClient
+from .poll import poll_until, poll_until_async
 
 __all__ = [
     "DEFAULT_BASE_URL_CN",
@@ -28,6 +33,9 @@ __all__ = [
     "AholoClientConfig",
     "AholoError",
     "AholoGatewayClient",
+    "AsyncAholoGatewayClient",
+    "AsyncBaseHttpClient",
+    "AsyncOusHttpClient",
     "AuthenticationError",
     "BaseHttpClient",
     "BusinessError",
@@ -38,8 +46,10 @@ __all__ = [
     "RateLimitError",
     "assert_cmd_ok",
     "assert_cmd_success",
+    "create_async_gateway_client",
     "create_gateway_client",
     "poll_until",
+    "poll_until_async",
     "resolve_api_key",
     "resolve_base_url",
 ]

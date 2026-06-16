@@ -1,5 +1,7 @@
 package com.manycoreapis.sdk.core;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,8 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 
 public final class JsonSupport {
-    public static final ObjectMapper MAPPER = new ObjectMapper();
-    public static final TypeReference<Map<String, Object>> MAP = new TypeReference<>() {};
+    public static final ObjectMapper MAPPER = new ObjectMapper()
+            .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+    public static final TypeReference<Map<String, Object>> MAP = new TypeReference<Map<String, Object>>() {};
 
     private JsonSupport() {}
 

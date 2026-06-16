@@ -1,7 +1,7 @@
 import { resolveApiKey, resolveBaseUrl, DEFAULT_TIMEOUT_MS, type AholoClientConfig } from './config.js';
 import { BaseHttpClient, type HttpRequestOptions } from './http.js';
 
-const DEFAULT_USER_AGENT = 'aholo-sdk-core/1.1.0';
+const DEFAULT_USER_AGENT = 'aholo-sdk-core/1.2.0';
 
 /**
  * HTTP client for Aholo Open Platform gateway (`Authorization: <apiKey>`).

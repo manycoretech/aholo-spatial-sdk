@@ -51,3 +51,45 @@ class TasksResource:
             interval_ms=interval_ms,
             timeout_ms=timeout_ms,
         )
+
+from manycore.aholo_sdk_core import AsyncAholoGatewayClient, BusinessError, assert_cmd_success, poll_until_async
+
+from .._paths import lux3d_path
+from ..types import LUX3D_STATUS_FAILED, LUX3D_STATUS_SUCCESS, Lux3dTaskResult
+
+
+class AsyncTasksResource:
+    def __init__(self, gateway: AsyncAholoGatewayClient, region: str) -> None:
+        self._gateway = gateway
+        self._region = region
+
+    async def retrieve(self, task_id: int | str) -> Lux3dTaskResult:
+        body = await self._gateway.gateway_request(
+            method="GET",
+            path=lux3d_path(self._region, "/generate/task/get"),
+            query={"taskid": str(task_id)},
+        )
+        data = assert_cmd_success(body, "tasks.retrieve")
+        if data.get("taskId") is None or data.get("status") is None:
+            raise BusinessError("Lux3D task query returned incomplete data", body=data)
+        return Lux3dTaskResult(
+            taskId=data["taskId"],
+            status=data["status"],
+            outputs=data.get("outputs") or [],
+        )
+
+    async def wait_for(
+        self,
+        task_id: int | str,
+        *,
+        interval_ms: int = DEFAULT_POLL_INTERVAL_MS,
+        timeout_ms: int = DEFAULT_POLL_TIMEOUT_MS,
+    ) -> Lux3dTaskResult:
+        return await poll_until_async(
+            lambda: self.retrieve(task_id),
+            is_done=lambda r: r.get("status") == LUX3D_STATUS_SUCCESS,
+            is_failed=lambda r: r.get("status") == LUX3D_STATUS_FAILED,
+            fail_message=lambda r: f"Lux3D task failed taskId={task_id} status={r.get('status')}",
+            interval_ms=interval_ms,
+            timeout_ms=timeout_ms,
+        )

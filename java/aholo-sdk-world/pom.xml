@@ -9,8 +9,9 @@
         <version>1.0.0</version>
     </parent>
     <artifactId>aholo-sdk-world</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <name>Aholo SDK World</name>
+    <description>World reconstruction client for the Aholo Java SDK</description>
     <dependencies>
         <dependency>
             <groupId>com.manycoreapis</groupId>

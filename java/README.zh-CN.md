@@ -6,7 +6,7 @@
 
 > 📖 **完整文档（canonical）**：[https://labs.aholo3d.cn/api-docs/sdk/java](https://labs.aholo3d.cn/api-docs/sdk/java)
 
-**运行要求：** Java ≥ 17，Maven ≥ 3.6
+**运行要求：** Java 8+，Maven ≥ 3.6（推荐使用 JDK 17 或 21 构建）
 
 ## 包列表
 

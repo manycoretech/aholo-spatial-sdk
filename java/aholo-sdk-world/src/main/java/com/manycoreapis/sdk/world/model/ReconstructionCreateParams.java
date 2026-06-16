@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /** Parameters for creating a 3DGS reconstruction world task. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -17,6 +18,9 @@ public final class ReconstructionCreateParams {
 
     @JsonProperty("cover")
     private final String cover;
+
+    @JsonProperty("useMask")
+    private final Boolean useMask;
 
     @JsonProperty("resources")
     private final List<WorldResource> resources;
@@ -31,16 +35,25 @@ public final class ReconstructionCreateParams {
         this.name = b.name;
         this.cover = b.cover;
         this.resources = Collections.unmodifiableList(new ArrayList<>(b.resources));
+        this.useMask = b.useMask;
         this.taskQuality = b.taskQuality;
         this.scene = b.scene;
     }
 
     public static Builder builder() { return new Builder(); }
 
+    public Optional<String> name()         { return Optional.ofNullable(name); }
+    public Optional<String> cover()        { return Optional.ofNullable(cover); }
+    public Optional<Boolean> useMask()       { return Optional.ofNullable(useMask); }
+    public List<WorldResource> resources()   { return resources; }
+    public String taskQuality()              { return taskQuality; }
+    public String scene()                    { return scene; }
+
     public static final class Builder {
         private String name;
         private String cover;
         private final List<WorldResource> resources = new ArrayList<>();
+        private Boolean useMask;
         private String taskQuality;
         private String scene;
 
@@ -48,6 +61,8 @@ public final class ReconstructionCreateParams {
 
         public Builder name(String name)               { this.name = name; return this; }
         public Builder cover(String cover)             { this.cover = cover; return this; }
+        public Builder useMask(boolean useMask)        { this.useMask = useMask; return this; }
+        public Builder useMask(Boolean useMask)      { this.useMask = useMask; return this; }
         public Builder taskQuality(String taskQuality) { this.taskQuality = taskQuality; return this; }
         public Builder scene(String scene)             { this.scene = scene; return this; }
 

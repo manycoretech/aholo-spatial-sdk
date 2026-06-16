@@ -107,6 +107,8 @@ print(result)
 
 ### Java
 
+**Requirements:** Java 8+ (build with JDK 17 or 21 recommended). See [java/README.md](java/README.md).
+
 **Maven (`pom.xml`):**
 
 > Replace `LATEST_VERSION` with the version shown in the Maven Central badge above.
@@ -198,4 +200,4 @@ See full examples for each language:
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) · [Changelog](CHANGELOG.md) · [Security](SECURITY.md)

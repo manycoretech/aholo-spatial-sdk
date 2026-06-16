@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /** Parameters for listing worlds with optional pagination and status filter. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -33,6 +34,10 @@ public final class WorldListParams {
     public static WorldListParams empty() { return builder().build(); }
 
     public static Builder builder() { return new Builder(); }
+
+    public Optional<Integer> pageNum()           { return Optional.ofNullable(pageNum); }
+    public Optional<Integer> pageSize()          { return Optional.ofNullable(pageSize); }
+    public Optional<List<String>> statusList()   { return Optional.ofNullable(statusList); }
 
     public static final class Builder {
         private Integer pageNum;

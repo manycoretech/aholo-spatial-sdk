@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import time
-from typing import Callable, Optional, TypeVar
+from typing import Awaitable, Callable, Optional, TypeVar, Union
 
 from .errors import PollingFailedError, PollingTimeoutError
 
@@ -27,3 +28,26 @@ def poll_until(
         if (time.monotonic() - started) * 1000 >= timeout_ms:
             raise PollingTimeoutError(f"Polling timed out after {timeout_ms}ms", timeout_ms=timeout_ms)
         time.sleep(interval_ms / 1000.0)
+
+
+async def poll_until_async(
+    fn: Callable[[], Union[T, Awaitable[T]]],
+    *,
+    is_done: Callable[[T], bool],
+    is_failed: Optional[Callable[[T], bool]] = None,
+    fail_message: Optional[Callable[[T], str]] = None,
+    interval_ms: int = 500,
+    timeout_ms: int = 300_000,
+) -> T:
+    started = time.monotonic()
+    while True:
+        result = fn()
+        if asyncio.iscoroutine(result):
+            result = await result
+        if is_failed and is_failed(result):
+            raise PollingFailedError(fail_message(result) if fail_message else "Polling failed")
+        if is_done(result):
+            return result
+        if (time.monotonic() - started) * 1000 >= timeout_ms:
+            raise PollingTimeoutError(f"Polling timed out after {timeout_ms}ms", timeout_ms=timeout_ms)
+        await asyncio.sleep(interval_ms / 1000.0)
