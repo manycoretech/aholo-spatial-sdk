@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "manycore-aholo-sdk-world"
-version = "1.1.0"
+version = "1.2.0"
 description = "Aholo 3DGS world client"
 license = "MIT"
 requires-python = ">=3.9"
-dependencies = ["manycore-aholo-sdk-core>=1.0.0,<2.0.0"]
+dependencies = ["manycore-aholo-sdk-core>=1.2.0,<2.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/manycoretech/aholo-spatial-sdk"

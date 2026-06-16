@@ -1,6 +1,6 @@
 {
   "name": "@manycore/aholo-sdk-core",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Aholo Open API shared HTTP client, errors, and polling utilities",
   "license": "MIT",
   "repository": {

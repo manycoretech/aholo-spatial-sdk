@@ -4,7 +4,7 @@ set -euo pipefail
 # Publish Aholo Java SDK artifacts to Maven Central (Sonatype Central Portal).
 #
 # Prerequisites:
-#   1. Maven >= 3.6, Java >= 17
+#   1. Maven >= 3.6, JDK 17 or 21 for building (artifacts target Java 8+)
 #   2. Sonatype Central User Token in settings.xml:
 #        <server>
 #          <id>central</id>

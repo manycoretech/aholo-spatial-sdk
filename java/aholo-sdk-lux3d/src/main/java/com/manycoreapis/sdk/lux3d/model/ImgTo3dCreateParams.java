@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /** Parameters for creating an image-to-3D task. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -21,6 +22,9 @@ public final class ImgTo3dCreateParams {
     }
 
     public static Builder builder() { return new Builder(); }
+
+    public String img()                          { return img; }
+    public Optional<String> version()            { return Optional.ofNullable(version); }
 
     public static final class Builder {
         private String img;

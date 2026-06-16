@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /** Parameters for creating a text-to-3D task. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -29,6 +30,11 @@ public final class TextTo3dCreateParams {
     }
 
     public static Builder builder() { return new Builder(); }
+
+    public String prompt()                       { return prompt; }
+    public Optional<String> style()              { return Optional.ofNullable(style); }
+    public Optional<String> img()                { return Optional.ofNullable(img); }
+    public Optional<String> version()            { return Optional.ofNullable(version); }
 
     public static final class Builder {
         private String prompt;

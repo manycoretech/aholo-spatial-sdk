@@ -192,3 +192,151 @@ class AssetClient:
 
 def create_asset_client(config: Optional[AholoClientConfig] = None) -> AssetClient:
     return AssetClient(config)
+
+
+import asyncio
+
+from manycore.aholo_sdk_core import AsyncOusHttpClient, create_async_gateway_client, poll_until_async
+
+
+class AsyncAssetClient:
+    def __init__(self, config: Optional[AholoClientConfig] = None) -> None:
+        self.config = config or AholoClientConfig()
+        self.gateway = create_async_gateway_client(self.config)
+
+    async def close(self) -> None:
+        await self.gateway.close()
+
+    async def __aenter__(self) -> "AsyncAssetClient":
+        return self
+
+    async def __aexit__(self, *args: object) -> None:
+        await self.close()
+
+    async def get_upload_token(self) -> Mapping[str, Any]:
+        return await self.gateway.gateway_request(method="GET", path=_token_path(self.config.region))
+
+    async def upload_bytes(self, data: bytes, *, filename: str = "upload.bin", **options: Any) -> UploadResult:
+        token = await self.get_upload_token()
+        ous = AsyncOusHttpClient(
+            base_url=token["globalDomain"],
+            ous_token=token["ousToken"],
+            timeout_ms=self.config.timeout_ms,
+        )
+        digest = md5_hex(data)
+        block_size = int(token["blockSize"])
+        on_progress: Optional[Callable[[int, int], None]] = options.get("on_progress")
+        if len(data) <= block_size:
+            await self._single_upload(ous, data, digest, filename, on_progress)
+        else:
+            await self._block_upload(ous, data, digest, filename, block_size, options, on_progress)
+        return await self._poll_status(ous, options)
+
+    async def upload_file(self, file_path: str | Path, **options: Any) -> UploadResult:
+        path = Path(file_path)
+        data = await asyncio.to_thread(path.read_bytes)
+        return await self.upload_bytes(data, filename=options.pop("filename", path.name), **options)
+
+    async def _single_upload(
+        self,
+        ous: AsyncOusHttpClient,
+        data: bytes,
+        digest: str,
+        filename: str,
+        on_progress: Optional[Callable[[int, int], None]] = None,
+    ) -> None:
+        body = await ous.request(
+            method="POST",
+            path="/ous/api/v2/single/upload",
+            files={"md5": (None, digest), "file": (filename, data, "application/octet-stream")},
+        )
+        assert_cmd_ok(body, "single upload")
+        if on_progress:
+            on_progress(len(data), len(data))
+
+    async def _block_upload(
+        self,
+        ous: AsyncOusHttpClient,
+        data: bytes,
+        digest: str,
+        filename: str,
+        block_size: int,
+        options: Mapping[str, Any],
+        on_progress: Optional[Callable[[int, int], None]] = None,
+    ) -> None:
+        parts = [data[i : i + block_size] for i in range(0, len(data), block_size)]
+        init_body = await ous.request(
+            method="POST",
+            path="/ous/api/v2/block/upload/init",
+            query={
+                "md5": digest,
+                "blocks": len(parts),
+                "size": len(data),
+                "name": filename,
+                "metadata": options.get("metadata"),
+                "customPrefix": options.get("custom_prefix"),
+                "customFilename": options.get("custom_filename"),
+            },
+        )
+        init_data = assert_cmd_success(init_body, "block upload init")
+        if init_data.get("deduplicated"):
+            return
+
+        indexed_parts = list(enumerate(parts))
+        lack_blocks = init_data.get("lackBlocks")
+        if lack_blocks is not None:
+            lack_set = _parse_lack_blocks(lack_blocks)
+            indexed_parts = [(i, chunk) for i, chunk in indexed_parts if (i + 1) in lack_set]
+        if not indexed_parts:
+            return
+
+        part_timeout_ms = options.get("part_timeout_ms", DEFAULT_UPLOAD_PART_TIMEOUT_MS)
+        total = len(data)
+        uploaded_bytes = 0
+        lock = asyncio.Lock() if on_progress else None
+        semaphore = asyncio.Semaphore(DEFAULT_PART_CONCURRENCY)
+
+        async def upload_part(index: int, chunk: bytes) -> None:
+            nonlocal uploaded_bytes
+            async with semaphore:
+                part_body = await ous.request(
+                    method="POST",
+                    path="/ous/api/v2/block/upload/part",
+                    files={
+                        "block": (None, str(index + 1)),
+                        "file": (f"{filename}.part{index + 1}", chunk, "application/octet-stream"),
+                    },
+                    timeout_ms=part_timeout_ms,
+                )
+                assert_cmd_ok(part_body, f"block upload part {index + 1}")
+                if on_progress:
+                    async with lock:
+                        uploaded_bytes += len(chunk)
+                        on_progress(uploaded_bytes, total)
+
+        await asyncio.gather(*(upload_part(i, chunk) for i, chunk in indexed_parts))
+
+    async def _poll_status(self, ous: AsyncOusHttpClient, options: Mapping[str, Any]) -> UploadResult:
+        poll_opts = options.get("poll") or {}
+        async def _fetch_status():
+            body = await ous.request(method="GET", path="/ous/api/v2/upload/status")
+            return assert_cmd_success(body, "upload status")
+
+        status = await poll_until_async(
+            _fetch_status,
+            is_done=lambda d: d.get("status") == OUS_STATUS_SUCCESS and bool(d.get("url")),
+            is_failed=lambda d: d.get("status") in OUS_TERMINAL_FAILURE,
+            fail_message=lambda d: f"Upload failed status={d.get('status')} errorCode={d.get('errorCode')}",
+            interval_ms=poll_opts.get("interval_ms", DEFAULT_POLL_INTERVAL_MS),
+            timeout_ms=poll_opts.get("timeout_ms", DEFAULT_POLL_TIMEOUT_MS),
+        )
+        return UploadResult(
+            url=status["url"],
+            md5=status.get("md5") or "",
+            upload_key=status.get("uploadKey"),
+            obs_task_id=status.get("obsTaskId"),
+        )
+
+
+def create_async_asset_client(config: Optional[AholoClientConfig] = None) -> AsyncAssetClient:
+    return AsyncAssetClient(config)

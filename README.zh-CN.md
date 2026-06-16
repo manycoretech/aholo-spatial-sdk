@@ -115,6 +115,8 @@ print(result)
 
 ### Java
 
+**运行要求：** Java 8+（推荐使用 JDK 17 或 21 构建）。详见 [java/README.zh-CN.md](java/README.zh-CN.md)。
+
 **Maven 依赖（`pom.xml`）：**
 
 > 将 `最新版本号` 替换为上方 Maven Central 徽章中显示的版本。

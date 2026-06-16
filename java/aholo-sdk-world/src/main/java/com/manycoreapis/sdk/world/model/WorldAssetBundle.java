@@ -10,22 +10,27 @@ import java.util.Optional;
 public final class WorldAssetBundle {
 
     private final WorldSplatBundle splats;
-    private final String lodMetaPath;
+    private final WorldImagery imagery;
+    private final WorldSemanticsMetadata semanticsMetadata;
 
     @JsonCreator
     public WorldAssetBundle(
-            @JsonProperty("splats")      WorldSplatBundle splats,
-            @JsonProperty("lodMetaPath") String lodMetaPath
+            @JsonProperty("splats")             WorldSplatBundle splats,
+            @JsonProperty("imagery")            WorldImagery imagery,
+            @JsonProperty("semanticsMetadata")  WorldSemanticsMetadata semanticsMetadata
     ) {
         this.splats = splats;
-        this.lodMetaPath = lodMetaPath;
+        this.imagery = imagery;
+        this.semanticsMetadata = semanticsMetadata;
     }
 
-    public Optional<WorldSplatBundle> splats()     { return Optional.ofNullable(splats); }
-    public Optional<String>           lodMetaPath() { return Optional.ofNullable(lodMetaPath); }
+    public Optional<WorldSplatBundle> splats()              { return Optional.ofNullable(splats); }
+    public Optional<WorldImagery> imagery()                 { return Optional.ofNullable(imagery); }
+    public Optional<WorldSemanticsMetadata> semanticsMetadata() { return Optional.ofNullable(semanticsMetadata); }
 
     @Override
     public String toString() {
-        return "WorldAssetBundle{splats=" + splats + ", lodMetaPath='" + lodMetaPath + "'}";
+        return "WorldAssetBundle{splats=" + splats + ", imagery=" + imagery
+                + ", semanticsMetadata=" + semanticsMetadata + "}";
     }
 }

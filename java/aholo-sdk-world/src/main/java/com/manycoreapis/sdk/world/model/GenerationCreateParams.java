@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /** Parameters for creating a world generation task. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -34,6 +35,11 @@ public final class GenerationCreateParams {
     }
 
     public static Builder builder() { return new Builder(); }
+
+    public Optional<String> name()                      { return Optional.ofNullable(name); }
+    public Optional<String> cover()                     { return Optional.ofNullable(cover); }
+    public Optional<String> prompt()                    { return Optional.ofNullable(prompt); }
+    public Optional<List<WorldResource>> resources()    { return Optional.ofNullable(resources); }
 
     public static final class Builder {
         private String name;

@@ -6,6 +6,7 @@ WorldTaskStatus = Literal["PENDING", "PREPROCESSING", "RUNNING", "SUCCEEDED", "F
 WorldScene = Literal["model", "space"]
 WorldTaskQuality = Literal["low", "normal", "high"]
 WorldResourceType = Literal["image", "video"]
+WorldUpAxis = Literal["Y", "Z"]
 
 WORLD_TERMINAL_FAILURE_STATUSES = frozenset({"FAILED", "CANCELED", "TIMEOUT", "REJECTED"})
 
@@ -36,9 +37,18 @@ class WorldSplatBundle(TypedDict, total=False):
     urls: SplatFileUrls
 
 
+class WorldImagery(TypedDict, total=False):
+    panoUrl: str
+
+
+class WorldSemanticsMetadata(TypedDict, total=False):
+    upAxis: WorldUpAxis
+
+
 class WorldAssetBundle(TypedDict, total=False):
     splats: WorldSplatBundle
-    lodMetaPath: str
+    imagery: WorldImagery
+    semanticsMetadata: WorldSemanticsMetadata
 
 
 class _WorldDetailBase(TypedDict):

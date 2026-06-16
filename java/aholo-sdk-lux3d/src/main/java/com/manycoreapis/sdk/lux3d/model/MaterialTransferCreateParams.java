@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /** Parameters for creating a material-transfer task. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -25,6 +26,10 @@ public final class MaterialTransferCreateParams {
     }
 
     public static Builder builder() { return new Builder(); }
+
+    public String img()                          { return img; }
+    public String meshUrl()                      { return meshUrl; }
+    public Optional<String> version()            { return Optional.ofNullable(version); }
 
     public static final class Builder {
         private String img;

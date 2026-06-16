@@ -14,8 +14,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create 3DGS world reconstruction job
-         * @description 异步创建一条 3DGS 世界重建任务。受理成功后返回 `WorldAsyncOperation`，仅含 `worldId`，与「Get world details」路径 `{worldId}` 一致。**输入规则**：若 `resources` 中含有图片类资源（`type=image` 或省略 `type`），则图片类条数须 **至少 20 条**；仅使用视频时请将每条资源的 `type` 设为 `video`（此时不按「至少 20 张图」限制）。
+         * 创建 3DGS 世界重建任务
+         * @description 异步创建一条 3DGS 世界重建任务。受理成功后返回 `WorldAsyncOperation`，仅含 `worldId`，与「查询世界详情」路径 `{worldId}` 一致。**输入规则**：若 `resources` 中含有图片类资源（`type=image` 或省略 `type`），则图片类条数须 **至少 20 条**；仅使用视频时请将每条资源的 `type` 设为 `video`（此时不按「至少 20 张图」限制）。
          */
         post: operations["createWorld"];
         delete?: never;
@@ -34,8 +34,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create 3DGS world generation job
-         * @description Creates an async 3DGS world generation job (Spatial Gen). **Indoor** scenes are more mature and stable today; non-indoor input is allowed but still **Beta** and may be materially weaker than indoor—assess risk accordingly. On acceptance returns `WorldAsyncOperation` (`worldId` only). At most **one** image-type resource (`type=image` or omitted counts as image).
+         * 创建 3DGS 世界生成任务
+         * @description 异步创建一条3DGS 世界生成任务（Spatial Gen）。当前 **室内空间** 场景效果更成熟、更稳定，建议优先用于室内。也允许提交 **非室内** 类文案或素材，但非室内生成仍处于 **Beta**，质量与一致性可能明显弱于室内，请按需评估风险。受理成功后返回 `WorldAsyncOperation`（仅含 `worldId`）。若 `resources` 中含图片类资源（`type` 为 image 或未传时按图片处理），最多允许 1 张图片。
          */
         post: operations["generateWorld"];
         delete?: never;
@@ -52,8 +52,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get world details
-         * @description Get details by world id. When reconstruction succeeds, splat (ply/spz) URLs may be present; after LOD post-processing, `assets.splats.urls.lodMetaPath` has LOD chunk metadata.
+         * 查询世界详情
+         * @description 根据世界 id 查询详情。重建成功且产出可用时，响应中包含 splat（ply/spz）等重建产物的下载地址；若已完成 LOD 后处理，`assets.splats.urls.lodMetaPath` 将包含 LOD 分块元数据文件的下载地址。AI 生成（Spatial Gen）世界在全景图产出后，`assets.imagery.panoUrl` 返回全景图下载地址。
          */
         get: operations["getWorldDetail"];
         put?: never;
@@ -74,8 +74,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Paginated list of my worlds
-         * @description Paginated list of 3DGS worlds for the current account.
+         * 分页查询我的世界列表
+         * @description 分页查询当前账号下的 3DGS 世界列表。
          */
         post: operations["getMyWorldList"];
         delete?: never;
@@ -89,33 +89,38 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
-         * @description Body for **Create 3DGS world reconstruction**. `scene` is `model` or `space`; `taskQuality` is `low`, `normal`, or `high`.
-         *     **Counts**: if any image-type resource (`type=image` or omit `type`), need **≥20** image entries; for video-only, set `type=video` on each (no 20-image rule).
+         * @description 创建 3DGS 世界重建任务的请求体。`scene` 仅支持 model 与 space；`taskQuality` 含义见 `WorldOpenApiTaskQuality`（low 极速预览 / normal 标准 / high 专业）。
+         *     **资源条数**：若 `resources` 中出现图片类资源（`type=image` 或省略 `type`，后者按图片计），则图片类至少 **20 条**；若仅使用视频，请为每条资源设置 `type=video`（不触发「至少 20 张图」规则）。
          */
         CreateWorldRequest: {
             /**
-             * @description Display name
-             * @example Living room reconstruction
+             * @description 世界展示名称
+             * @example 客厅重建
              */
             name?: string;
             /**
-             * @description Cover image URL (optional)
+             * @description 封面图 URL；可选
              * @example https://cdn.example.com/cover/custom-cover.jpg
              */
             cover?: string;
-            /** @description Input resources (≥1). With images, need ≥20 image entries (`type=image` or omit); video-only: set `type=video`. */
+            /** @description 输入资源列表，至少 1 条。含图片时须至少 20 条图片类（`type=image` 或省略 type）；纯视频请显式 `type=video`。 */
             resources: components["schemas"]["WorldResourceItem"][];
+            /**
+             * @description 是否对上传资源进行抠图。`true` 开启；省略或 `false` 不抠图。
+             * @example false
+             */
+            useMask?: boolean;
             taskQuality: components["schemas"]["WorldOpenApiTaskQuality"];
             scene: components["schemas"]["WorldOpenApiProjectScene"];
         };
         /**
-         * @description Scene type: `model` object scene; `space` indoor.
+         * @description 项目场景类型。model：物体场景；space：室内场景。
          * @example space
          * @enum {string}
          */
         WorldOpenApiProjectScene: "model" | "space";
         /**
-         * @description Resource type: `image` → IMAGES, `video` → VIDEO. Omitted counts as image; legacy `images` accepted.
+         * @description 输入资源类型，对应业务 ResourceTypeEnum.type。image：图片（映射 IMAGES）；video：视频（映射 VIDEO）。未传时后端按图片类型（IMAGES）处理；兼容历史 JSON 值 `images`。
          * @example image
          * @enum {string}
          */
@@ -126,10 +131,10 @@ export interface components {
          * @enum {string}
          */
         WorldOpenApiTaskQuality: "low" | "normal" | "high";
-        /** @description One input resource. For reconstruction: omit `type` → image; video-only → `video`. */
+        /** @description 单条输入资源（地址与类型）。用于「创建重建任务」时：未传 `type` 按 **图片** 计；纯走视频请传 `video`。 */
         WorldResourceItem: {
             /**
-             * @description Media URL; must match `type` and downstream rules.
+             * @description 资源地址 URL；可接受的媒体形态与 type 及下游处理一致。
              * @example https://cdn.example.com/input/room-001.jpg
              */
             url: string;
@@ -138,21 +143,21 @@ export interface components {
         /** @description 异步创建受理结果：封装 `worldId`，供调用方作为资源 id 请求详情直至终态。 */
         WorldAsyncOperation: {
             /**
-             * @description 世界 id；填入 `GET /global/world/v1/{worldId}` 的路径参数即可轮询任务状态与产出。
+             * @description 世界 id；填入 `GET /world/v1/{worldId}` 的路径参数即可轮询任务状态与产出。
              * @example A1b2C3d4E5
              */
             worldId: string;
         };
-        /** @description API error response with status, details, and optional help. */
+        /** @description API错误响应对象，包含完整的错误信息、状态码和帮助信息 */
         ApiError: {
             /**
              * Format: int32
-             * @description HTTP status code
+             * @description HTTP状态码
              * @example 403
              */
             code: number;
             /**
-             * @description Developer-facing error message (English); use `localizedMessage` for user-visible localized text.
+             * @description 面向开发者的错误消息（英文），用户可见的本地化消息请使用localizedMessage字段
              * @example Permission denied to access this resource
              */
             message: string;
@@ -162,30 +167,30 @@ export interface components {
             help?: components["schemas"]["Help"];
         };
         /**
-         * @description REST API status code per Google API design guidelines.
+         * @description REST API标准状态码，符合Google API设计规范，用于统一的错误码表示
          * @example PERMISSION_DENIED
          * @enum {string}
          */
         Code: "OK" | "CANCELLED" | "UNKNOWN" | "INVALID_ARGUMENT" | "DEADLINE_EXCEEDED" | "NOT_FOUND" | "ALREADY_EXISTS" | "PERMISSION_DENIED" | "UNAUTHENTICATED" | "RESOURCE_EXHAUSTED" | "FAILED_PRECONDITION" | "ABORTED" | "OUT_OF_RANGE" | "UNIMPLEMENTED" | "INTERNAL" | "UNAVAILABLE" | "DATA_LOSS" | "PARTIAL_ELEMENT_UPDATE_FAILED";
-        /** @description Error details: reason, domain, and metadata. */
+        /** @description 错误详情对象，提供错误的详细上下文信息，包括原因、域和元数据 */
         ErrorDetails: {
             /**
-             * @description Error reason identifier in UPPER_SNAKE_CASE (max 63 characters).
+             * @description 错误原因标识符，使用大写蛇形命名法（UPPER_SNAKE_CASE），最多63个字符
              * @example RESOURCE_NOT_FOUND
              */
             reason: string;
             /**
-             * @description Human-readable explanation with error context.
+             * @description 针对此错误的人类可读说明，提供具体的错误上下文
              * @example The requested design with ID 12345 does not exist
              */
             message?: string | null;
             /**
-             * @description Error domain, usually the service that produced the error.
+             * @description 错误域，通常是生成错误的服务名称
              * @example restapi.qunhe.com
              */
             domain?: string | null;
             /**
-             * @description Additional metadata as key/value pairs (keys up to 64 chars, pattern /[a-zA-Z0-9-_]/).
+             * @description 错误的附加元数据，键值对格式，键最多64个字符，符合模式 /[a-zA-Z0-9-_]/
              * @example {
              *       "instanceLimitPerRequest": "100",
              *       "currentInstanceCount": "150"
@@ -195,84 +200,80 @@ export interface components {
                 [key: string]: string | null;
             } | null;
         };
-        /** @description Help link and description for resolving the error. */
+        /** @description 帮助信息对象，提供解决错误的文档链接和说明 */
         Help: {
             /**
-             * @description Description of the linked help document.
-             * @example How to resolve permission denied errors
+             * @description 链接内容的描述，说明此帮助文档的用途
+             * @example 如何解决权限拒绝错误
              */
             desc: string;
             /**
-             * @description URL of the help document
+             * @description 帮助文档的URL链接
              * @example https://docs.example.com/errors/permission-denied
              */
             url: string;
         } | null;
-        /** @description Localized message for a specific locale. */
+        /** @description 本地化消息对象，提供特定语言环境的错误消息 */
         LocalizedMessage: {
             /**
-             * @description Locale identifier for the message
+             * @description 消息的语言环境标识
              * @example zh_CN
              */
             locale: string;
             /**
-             * @description Localized error text for end users
-             * @example You do not have permission to access this resource
+             * @description 本地化后的错误消息文本，面向最终用户
+             * @example 您没有访问此资源的权限
              */
             message: string;
         } | null;
-        /** @description List body: `pageNum` from 0, `pageSize` 1–100 (default 20 when 0 or omitted). Returns 3DGS worlds for the current account only. */
+        /** @description 分页查询「我的世界」列表的请求体：`pageNum` 从 0 起；`pageSize` 为每页条数（1–100，缺省或 0 时按 20 条计）。仅查询当前账号下的 3DGS 世界数据。 */
         WorldListQueryRequest: {
             /**
              * Format: int32
-             * @description Page index (0-based).
+             * @description 页码（从 0 起）。
              * @example 0
              */
             pageNum?: number;
             /**
              * Format: int32
-             * @description Page size (max 100); defaults to 20 when 0 or omitted.
+             * @description 每页条数，最大 100；为 0 或未传时按 20 条计。
              * @example 20
              */
             pageSize?: number;
-            /** @description Filter by reconstruction status; empty means no status filter. */
+            /** @description 按重建任务状态过滤；为空表示不按状态过滤。 */
             statusList?: components["schemas"]["WorldOpenApiTaskStatus"][];
         };
         /**
-         * @description Task status — in progress: `PENDING` queued, `PREPROCESSING` preprocessing, `RUNNING` running. Terminal: `SUCCEEDED`, `FAILED`, `CANCELED`, `TIMEOUT`, `REJECTED`.
+         * @description 重建任务状态。**进行中**：`PENDING` 排队中；`PREPROCESSING` 预处理中；`RUNNING` 执行中。**终态**：`SUCCEEDED` 成功；`FAILED` 失败；`CANCELED` 取消；`TIMEOUT` 超时；`REJECTED` 被拒绝。
          * @example SUCCEEDED
          * @enum {string}
          */
         WorldOpenApiTaskStatus: "PENDING" | "PREPROCESSING" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELED" | "TIMEOUT" | "REJECTED";
-        /** @description 3DGS splat download URLs: PLY / SPZ and optional LOD metadata (same fields as task output). */
+        /** @description 3DGS Splat 相关产物的下载地址：PLY / SPZ 与可选的 LOD 分块元数据（对应任务 output 的同名字段）。 */
         SplatFileUrls: {
             /**
-             * @description PLY URL (`output.plyPath`).
+             * @description PLY 文件 URL（output.plyPath）。
              * @example https://cdn.example.com/output/world-001.ply
              */
             plyPath?: string;
             /**
-             * @description SPZ URL (`output.spzPath`).
+             * @description SPZ 文件 URL（output.spzPath）。
              * @example https://cdn.example.com/output/world-001.spz
              */
             spzPath?: string;
             /**
-             * @description LOD chunk metadata download URL (`output.lodMetaPath`); present after successful LOD post-processing, else null.
+             * @description LOD 分块元数据文件下载 URL（output.lodMetaPath）。任务成功且已完成 LOD 后处理时存在，否则为 null。
              * @example https://cdn.example.com/output/world-001-lod-meta.json
              */
             lodMetaPath?: string;
         };
-        /** @description Reconstruction outputs; on success, splats are filled and LOD metadata sits with ply/spz URLs under `splats.urls`. */
+        /** @description 世界产物容器。3D 重建任务成功时填充 `splats`（ply/spz/lodMetaPath 在 `splats.urls` 中）；AI 生成任务另在 `imagery.panoUrl` 返回全景图下载地址。 */
         WorldAssetBundle: {
             splats?: components["schemas"]["WorldSplatBundle"];
-            /**
-             * @description LOD chunk metadata download URL (`lodMetaPath`). Present after successful LOD post-processing; otherwise null.
-             * @example https://cdn.example.com/output/world-001-lod-meta.json
-             */
-            lodMetaPath?: string;
+            imagery?: components["schemas"]["WorldImagery"];
             semanticsMetadata?: components["schemas"]["WorldSemanticsMetadata"];
         };
-        /** @description World record: `worldId`, `scene`, `status`; `createTime` / `updateTime` are Unix ms. Details may include splat URLs when outputs are ready. */
+        /** @description 世界信息。`worldId` 为业务侧世界唯一标识；`scene`/`status` 等为约定字符串；`createTime` / `updateTime` 为 Unix 毫秒时间戳（与 1.6.2-2-1 时间字段约定一致）。详情接口在产出可用时，可能返回 splat 等下载地址；AI 生成世界另在 `assets.imagery.panoUrl` 返回全景图。 */
         WorldDetail: {
             /**
              * @description 世界唯一标识；开放「创建世界」接口在 `WorldAsyncOperation.worldId` 字段中返回与本字段相同的值。
@@ -280,74 +281,90 @@ export interface components {
              */
             worldId: string;
             /**
-             * @description World name
-             * @example Living room reconstruction
+             * @description 世界名称
+             * @example 客厅重建
              */
             name?: string;
             /**
-             * @description Cover image URL.
+             * @description 封面图 URL。
              * @example https://cdn.example.com/cover/world-001.jpg
              */
             cover?: string;
             scene?: components["schemas"]["WorldOpenApiProjectScene"];
             /**
              * Format: int64
-             * @description Created at, Unix milliseconds.
+             * @description 创建时间，Unix 毫秒时间戳。
              * @example 1699339916000
              */
             createTime?: number;
             /**
              * Format: int64
-             * @description Updated at, Unix milliseconds.
+             * @description 最近修改时间，Unix 毫秒时间戳。
              * @example 1699340120000
              */
             updateTime?: number;
             status?: components["schemas"]["WorldOpenApiTaskStatus"];
             /**
              * Format: float
-             * @description Reconstruction progress in [0.0, 1.0].
+             * @description 重建任务进度 [0.0, 1.0]。
              * @example 0.65
              */
             progress?: number;
             assets?: components["schemas"]["WorldAssetBundle"];
         };
-        /** @description Paged list with `pageNum` / `pageSize`, current page rows, and totals. */
+        /** @description AI 生成世界的图片产物；当前仅包含全景图下载地址。 */
+        WorldImagery: {
+            /**
+             * @description AI 生成全景图下载地址。仅 AI 生成（Spatial Gen）世界在全景图子任务成功后有值。
+             * @example https://cdn.example.com/output/world-001-pano.jpg
+             */
+            panoUrl?: string;
+        };
+        /**
+         * @description 世界坐标 up 轴。Y：+Y 朝上（glTF/USD 默认）；Z：+Z 朝上（本服务 3DGS 产出约定）。
+         * @example Z
+         * @enum {string}
+         */
+        WorldOpenApiUpAxis: "Y" | "Z";
+        /** @description 世界列表分页结果：含本次请求的 `pageNum` / `pageSize`，以及当前页数据与总计。 */
         WorldPagedList: {
             /**
              * Format: int32
-             * @description Page index used for this request (0-based).
+             * @description 本次请求使用的页码（从 0 起）。
              * @example 0
              */
             pageNum?: number;
             /**
              * Format: int32
-             * @description Page size used for this request.
+             * @description 本次请求使用的每页条数。
              * @example 20
              */
             pageSize?: number;
             /**
              * Format: int32
-             * @description Rows on this page.
+             * @description 当前页记录条数。
              * @example 20
              */
             count?: number;
             /**
              * Format: int32
-             * @description Total matching rows.
+             * @description 符合筛选条件的总记录数。
              * @example 128
              */
             totalCount?: number;
             /**
-             * @description Whether another page exists.
+             * @description 是否还有下一页。
              * @example false
              */
             hasMore?: boolean;
-            /** @description Rows for this page (WorldOpen mapping; list uses withResult=false by default). */
+            /** @description 当前页的世界记录列表（由 ProjectAggregateDTO 映射为 WorldOpen，列表查询默认 withResult=false）。 */
             result?: components["schemas"]["WorldDetail"][];
         };
-        /** @description Semantics metadata placeholder; may be `{}`. */
-        WorldSemanticsMetadata: Record<string, never>;
-        /** @description 3DGS splat output files. */
+        /** @description 语义元数据（相机位姿、比例、偏移、坐标系约定等）。任务成功且返回 splat 产物时，应包含 upAxis 以标明坐标系。 */
+        WorldSemanticsMetadata: {
+            upAxis?: components["schemas"]["WorldOpenApiUpAxis"];
+        };
+        /** @description 3DGS splat 输出文件集合。 */
         WorldSplatBundle: {
             urls?: components["schemas"]["SplatFileUrls"];
         };
@@ -357,20 +374,20 @@ export interface components {
          */
         GenerateWorldRequest: {
             /**
-             * @description Project / world display name
-             * @example Living room generation
+             * @description 项目 / 世界展示名称
+             * @example 客厅生成
              */
             name?: string;
             /**
-             * @description Cover image URL (optional)。
+             * @description 封面图 URL；可选。
              * @example https://cdn.example.com/cover/gen-cover.jpg
              */
             cover?: string;
-            /** @description Resources; provide `prompt` and/or resources. At most one image; omit `type` → image. */
+            /** @description 输入资源列表；与 prompt 至少满足其一。图片类条目至多 1 条；未传 type 时按图片处理。 */
             resources?: components["schemas"]["WorldResourceItem"][];
             /**
-             * @description Text prompt; can combine with `resources`.
-             * @example Modern minimalist sunlit living room
+             * @description 文本提示词；可与 resources 同时提供。
+             * @example 现代简约风格，阳光充足的客厅
              */
             prompt?: string;
         };
@@ -392,14 +409,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        /** @description Create-job body; when using images, meet the count rules in `CreateWorldRequest`. */
+        /** @description 创建任务请求体。含图时须满足图片张数与「CreateWorldRequest」中说明一致。 */
         requestBody: {
             content: {
                 "application/json": components["schemas"]["CreateWorldRequest"];
             };
         };
         responses: {
-            /** @description Accepted: returns `WorldAsyncOperation` with `worldId`. */
+            /** @description 受理成功：返回 `WorldAsyncOperation`，含 `worldId`。 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -408,7 +425,7 @@ export interface operations {
                     "application/json": components["schemas"]["WorldAsyncOperation"];
                 };
             };
-            /** @description Invalid body/parameters, insufficient credits, etc. (`ApiError`; legacy biz code in `details.metaData.bizCode`) */
+            /** @description 参数/请求体校验失败、积分不足等（ApiError，`details.metaData.bizCode` 为原业务码） */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -417,7 +434,7 @@ export interface operations {
                     "application/json": components["schemas"]["ApiError"];
                 };
             };
-            /** @description Missing or invalid `Authorization`; authentication failed (`ApiError`). */
+            /** @description 未携带或无效的 Authorization，鉴权失败（ApiError） */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -426,7 +443,7 @@ export interface operations {
                     "application/json": components["schemas"]["ApiError"];
                 };
             };
-            /** @description Global task concurrency or rate limit (`ApiError`) */
+            /** @description 全局任务并发或限流（ApiError） */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -446,14 +463,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        /** @description Generation request body; at most one image-type entry (same as `Project3dgsGenCreateWorld`). */
+        /** @description 生成世界请求体。图片类输入至多 1 条（与 `Project3dgsGenCreateWorld` 校验一致）。 */
         requestBody: {
             content: {
                 "application/json": components["schemas"]["GenerateWorldRequest"];
             };
         };
         responses: {
-            /** @description Accepted: returns `WorldAsyncOperation` with `worldId`. */
+            /** @description 受理成功：返回 `WorldAsyncOperation`，含 `worldId`。 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -462,7 +479,7 @@ export interface operations {
                     "application/json": components["schemas"]["WorldAsyncOperation"];
                 };
             };
-            /** @description Invalid body/parameters or other business errors (`ApiError`) */
+            /** @description 参数/请求体校验失败等业务错误（ApiError） */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -471,7 +488,7 @@ export interface operations {
                     "application/json": components["schemas"]["ApiError"];
                 };
             };
-            /** @description Missing or invalid `Authorization`; authentication failed (`ApiError`). */
+            /** @description 未携带或无效的 Authorization，鉴权失败（ApiError） */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -497,7 +514,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description On success, the body is a world detail object. */
+            /** @description 成功时响应体为世界详情对象。 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -506,7 +523,7 @@ export interface operations {
                     "application/json": components["schemas"]["WorldDetail"];
                 };
             };
-            /** @description Path parameter validation or other business errors (`ApiError`) */
+            /** @description 路径参数校验失败等业务错误（ApiError） */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -515,7 +532,7 @@ export interface operations {
                     "application/json": components["schemas"]["ApiError"];
                 };
             };
-            /** @description Missing or invalid `Authorization`; authentication failed (`ApiError`). */
+            /** @description 未携带或无效的 Authorization，鉴权失败（ApiError） */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -524,7 +541,7 @@ export interface operations {
                     "application/json": components["schemas"]["ApiError"];
                 };
             };
-            /** @description Access denied (`ApiError`) */
+            /** @description 无访问权限（ApiError） */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -533,7 +550,7 @@ export interface operations {
                     "application/json": components["schemas"]["ApiError"];
                 };
             };
-            /** @description World not found (`ApiError`) */
+            /** @description 世界不存在（ApiError） */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -551,14 +568,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        /** @description Pagination and filters. */
+        /** @description 分页与筛选条件。 */
         requestBody: {
             content: {
                 "application/json": components["schemas"]["WorldListQueryRequest"];
             };
         };
         responses: {
-            /** @description On success, the body is a paged list (`pageNum`, `pageSize`, rows, etc.). */
+            /** @description 成功时响应体为分页列表对象（含 `pageNum`、`pageSize`、列表项等）。 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -567,7 +584,7 @@ export interface operations {
                     "application/json": components["schemas"]["WorldPagedList"];
                 };
             };
-            /** @description Pagination parameter validation failed (`ApiError`) */
+            /** @description 分页参数等校验失败（ApiError） */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -576,7 +593,7 @@ export interface operations {
                     "application/json": components["schemas"]["ApiError"];
                 };
             };
-            /** @description Missing or invalid `Authorization`; authentication failed (`ApiError`). */
+            /** @description 未携带或无效的 Authorization，鉴权失败（ApiError） */
             401: {
                 headers: {
                     [name: string]: unknown;

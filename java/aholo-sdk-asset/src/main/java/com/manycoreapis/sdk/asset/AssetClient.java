@@ -15,6 +15,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Aholo asset upload client (OUS single/block upload with polling).
+ *
+ * <p>Stainless-style entry point:
+ * <pre>{@code
+ * AssetClient asset = AssetClient.create(AholoClientConfig.ofRegion("com"));
+ * UploadResult result = asset.uploadFile(Paths.get("room.mp4"), (uploaded, total) -> { ... });
+ * }</pre>
+ */
 @SuppressWarnings("unchecked")
 public class AssetClient {
     private static final int OUS_STATUS_SUCCESS = 5;

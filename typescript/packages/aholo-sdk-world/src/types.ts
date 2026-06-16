@@ -11,14 +11,17 @@ export type WorldDetail           = components['schemas']['WorldDetail'];
 export type WorldPagedList        = components['schemas']['WorldPagedList'];
 export type WorldListQueryRequest = components['schemas']['WorldListQueryRequest'];
 export type SplatFileUrls         = components['schemas']['SplatFileUrls'];
-export type WorldSplatBundle      = components['schemas']['WorldSplatBundle'];
-export type WorldAssetBundle      = components['schemas']['WorldAssetBundle'];
+export type WorldSplatBundle        = components['schemas']['WorldSplatBundle'];
+export type WorldImagery            = components['schemas']['WorldImagery'];
+export type WorldSemanticsMetadata  = components['schemas']['WorldSemanticsMetadata'];
+export type WorldAssetBundle        = components['schemas']['WorldAssetBundle'];
 
 // --- Enum aliases (spec uses longer internal names) ---
 export type WorldScene        = components['schemas']['WorldOpenApiProjectScene'];
 export type WorldTaskQuality  = components['schemas']['WorldOpenApiTaskQuality'];
 export type WorldResourceType = components['schemas']['WorldOpenApiResourceType'];
 export type WorldTaskStatus   = components['schemas']['WorldOpenApiTaskStatus'];
+export type WorldUpAxis       = components['schemas']['WorldOpenApiUpAxis'];
 
 // --- SDK-specific options (not part of the HTTP API) ---
 export interface WorldRequestOptions {

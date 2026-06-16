@@ -10,15 +10,13 @@ import com.manycoreapis.sdk.lux3d.resources.TextTo3dResource;
 /**
  * Aholo Lux3D API client.
  *
+ * <p>Stainless-style resource access:
  * <pre>{@code
  * Lux3dClient lux3d = Lux3dClient.create(AholoClientConfig.of("your_api_key", "com"));
- *
- * // Image to 3D from a local file
  * long taskId = lux3d.imgTo3d().createFromFile(Paths.get("chair.png"));
- *
- * // Poll until complete
+ * taskId = lux3d.textTo3d().create(TextTo3dCreateParams.builder().prompt("A wooden chair").build());
+ * lux3d.materialTransfer().create(MaterialTransferCreateParams.builder()...build());
  * TaskResult result = lux3d.tasks().waitFor(taskId);
- * result.outputs().forEach(o -> o.content().ifPresent(System.out::println));
  * }</pre>
  */
 public class Lux3dClient {
