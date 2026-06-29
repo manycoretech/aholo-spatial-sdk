@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional, cast
 
 from .._paths import world_path
-from ..types import WorldAsyncOperation, WorldResourceItem
+from ..types import GenerateWorldResourceItem, WorldAsyncOperation
 
 if TYPE_CHECKING:
     from manycore.aholo_sdk_core import AholoGatewayClient
@@ -18,7 +18,7 @@ class GenerationsResource:
         self,
         *,
         prompt: Optional[str] = None,
-        resources: Optional[List[WorldResourceItem]] = None,
+        resources: Optional[List[GenerateWorldResourceItem]] = None,
         name: Optional[str] = None,
         cover: Optional[str] = None,
         x_source: Optional[str] = None,
@@ -56,7 +56,7 @@ class AsyncGenerationsResource:
         self,
         *,
         prompt: Optional[str] = None,
-        resources: Optional[List[WorldResourceItem]] = None,
+        resources: Optional[List[GenerateWorldResourceItem]] = None,
         name: Optional[str] = None,
         cover: Optional[str] = None,
         x_source: Optional[str] = None,

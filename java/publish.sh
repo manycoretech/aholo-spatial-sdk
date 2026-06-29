@@ -18,8 +18,11 @@ set -euo pipefail
 #
 # Usage:
 #   ./publish.sh
+#   ./publish.sh --only world
+#   ./publish.sh --only aholo-sdk-world
 #   ./publish.sh --settings /path/to/maven-central-settings.xml
 #   ./publish.sh --dry-run
+#   ./publish.sh --only world --dry-run
 #   MAVEN_SETTINGS=/path/to/maven-central-settings.xml ./publish.sh
 #
 # Environment:
@@ -33,6 +36,7 @@ DRY_RUN=false
 SETTINGS_FILE="${MAVEN_SETTINGS:-}"
 GPG_PROFILE=""
 GPG_OPTS=()
+ONLY_FILTER=()
 
 MODULES=(
   aholo-sdk-core
@@ -44,6 +48,16 @@ MODULES=(
 log() { echo "[publish] $*"; }
 die() { echo "[publish] ERROR: $*" >&2; exit 1; }
 
+resolve_module() {
+  case "$1" in
+    core|aholo-sdk-core) echo "aholo-sdk-core" ;;
+    asset|aholo-sdk-asset) echo "aholo-sdk-asset" ;;
+    world|aholo-sdk-world) echo "aholo-sdk-world" ;;
+    lux3d|aholo-sdk-lux3d) echo "aholo-sdk-lux3d" ;;
+    *) die "Unknown module: $1 (use core|asset|world|lux3d or aholo-sdk-*)" ;;
+  esac
+}
+
 cleanup() {
   unset GPG_PASSPHRASE
 }
@@ -52,6 +66,11 @@ trap cleanup EXIT
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --dry-run) DRY_RUN=true; shift ;;
+    --only)
+      [[ $# -ge 2 ]] || die "--only requires a module name (e.g. world)"
+      ONLY_FILTER+=("$(resolve_module "$2")")
+      shift 2
+      ;;
     --settings)
       [[ $# -ge 2 ]] || die "--settings requires a path"
       SETTINGS_FILE="$2"
@@ -64,6 +83,11 @@ while [[ $# -gt 0 ]]; do
     *) die "Unknown argument: $1" ;;
   esac
 done
+
+if ((${#ONLY_FILTER[@]} > 0)); then
+  MODULES=("${ONLY_FILTER[@]}")
+  log "Selected modules: ${MODULES[*]}"
+fi
 
 command -v mvn >/dev/null 2>&1 || die "mvn not found"
 command -v gpg >/dev/null 2>&1 || die "gpg not found. Install gnupg and import the release signing key."
@@ -115,6 +139,15 @@ run_mvn() {
     cmd+=("${GPG_OPTS[@]}")
   fi
   cmd+=(-pl "$module_list")
+  if [[ "$include_also_make" == true ]]; then
+    cmd+=(-am)
+  fi
+  mvn "${cmd[@]}"
+}
+
+build_dependencies() {
+  log "Installing build dependencies (no deploy) ..."
+  local -a cmd=("${MVN_SETTINGS[@]}" clean install -pl "$module_list" -am)
   mvn "${cmd[@]}"
 }
 
@@ -126,18 +159,42 @@ if [[ -n "$SETTINGS_FILE" ]]; then
 fi
 
 cd "$ROOT"
-version="$(mvn "${MVN_SETTINGS[@]}" -q help:evaluate -Dexpression=project.version -DforceStdout)"
 group_id="$(mvn "${MVN_SETTINGS[@]}" -q help:evaluate -Dexpression=project.groupId -DforceStdout)"
 
-log "Coordinates: ${group_id}:${MODULES[*]} @ ${version}"
+log "Modules: ${MODULES[*]}"
+for mod in "${MODULES[@]}"; do
+  mod_version="$(mvn "${MVN_SETTINGS[@]}" -q help:evaluate -Dexpression=project.version -DforceStdout -pl "$mod")"
+  log "  ${group_id}:${mod}:${mod_version}"
+done
 
 module_list="$(IFS=,; echo "${MODULES[*]}")"
+partial_deploy=false
+if ((${#ONLY_FILTER[@]} > 0)); then
+  partial_deploy=true
+fi
+include_also_make=false
+if [[ "$partial_deploy" == false ]]; then
+  include_also_make=true
+fi
 
 if [[ "$DRY_RUN" == true ]]; then
   log "Dry-run: verify (compile, package, sign) — no upload to Central"
+  if [[ "$partial_deploy" == true ]]; then
+    build_dependencies
+    include_also_make=false
+  else
+    include_also_make=true
+  fi
   run_mvn clean verify
 else
-  log "Deploying to Maven Central ..."
+  if [[ "$partial_deploy" == true ]]; then
+    build_dependencies
+    include_also_make=false
+    log "Deploying selected modules only (skipping already-published parent/core) ..."
+  else
+    include_also_make=true
+    log "Deploying all modules to Maven Central ..."
+  fi
   run_mvn clean deploy
   log "Check status: https://central.sonatype.com → Deployments"
 fi

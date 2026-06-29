@@ -48,6 +48,8 @@ Apply for an API Key: [labs.aholo3d.cn](https://labs.aholo3d.cn) (China) · [lab
 
 See [examples/](examples/) for runnable scripts. Run instructions are in each script or the [full documentation](https://labs.aholo3d.com/api-docs/en/sdk/typescript).
 
+- `world-reconstruct.mts` — `.mp4`/`.mov` (`video`) or Insta360 `.insv` (`insv`)
+
 ## License
 
 [MIT](../LICENSE)

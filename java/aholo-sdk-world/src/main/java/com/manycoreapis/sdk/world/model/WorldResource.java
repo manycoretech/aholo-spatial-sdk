@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
-/** A media resource (image or video) associated with a world task. */
+/** A media resource (image, video, or Insta360 insv) for world reconstruction tasks. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class WorldResource {
 
@@ -31,7 +31,7 @@ public final class WorldResource {
     /** Resource URL (e.g. returned by AssetClient.uploadFile). */
     public String url() { return url; }
 
-    /** Resource type: {@code "image"} or {@code "video"}. */
+    /** Resource type: {@code "image"}, {@code "video"}, or {@code "insv"}. */
     public String type() { return type; }
 
     @Override

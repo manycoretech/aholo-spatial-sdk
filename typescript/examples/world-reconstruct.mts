@@ -1,24 +1,39 @@
 /**
- * Minimal example: upload a video, create a 3DGS reconstruction, poll until done.
+ * Minimal example: upload media, create a 3DGS reconstruction, poll until done.
+ *
+ * Supported inputs: `.mp4` / `.mov` (type `video`), Insta360 `.insv` (type `insv`).
  *
  * Usage:
  *   AHOLO_API_KEY=xxx npx tsx examples/world-reconstruct.mts ./room.mp4
+ *   AHOLO_API_KEY=xxx npx tsx examples/world-reconstruct.mts ./panorama.insv
  */
+import path from 'node:path';
+
 import { createAssetClient } from '@manycore/aholo-sdk-asset';
-import { createWorldClient } from '@manycore/aholo-sdk-world';
+import { createWorldClient, type WorldResourceType } from '@manycore/aholo-sdk-world';
+
+function reconstructionResourceType(filePath: string): WorldResourceType {
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext === '.insv') return 'insv';
+  if (ext === '.mp4' || ext === '.mov') return 'video';
+  console.error(`Unsupported extension "${ext}". Use .mp4, .mov, or .insv`);
+  process.exit(1);
+}
 
 const filePath = process.argv[2];
 if (!filePath) {
-  console.error('Usage: AHOLO_API_KEY=xxx npx tsx examples/world-reconstruct.mts <video-path>');
+  console.error('Usage: AHOLO_API_KEY=xxx npx tsx examples/world-reconstruct.mts <media-path>');
   process.exit(1);
 }
+
+const resourceType = reconstructionResourceType(filePath);
 
 const region = (process.env.AHOLO_REGION ?? 'cn') as 'cn' | 'com';
 const config = { region };
 const asset = createAssetClient(config);
 const world = createWorldClient(config);
 
-console.log(`Uploading ${filePath} ...`);
+console.log(`Uploading ${filePath} (type=${resourceType}) ...`);
 let t0 = Date.now();
 const uploaded = await asset.uploadFile(filePath, {
   onProgress(uploadedBytes, total) {
@@ -32,7 +47,7 @@ console.log(`Upload complete (${Date.now() - t0}ms) url=${uploaded.url}`);
 console.log('Creating reconstruction task...');
 const { worldId } = await world.reconstructions.create({
   name: 'SDK reconstruction demo',
-  resources: [{ url: uploaded.url, type: 'video' }],
+  resources: [{ url: uploaded.url, type: resourceType }],
   taskQuality: 'normal',
   scene: 'model',
 });

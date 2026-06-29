@@ -62,6 +62,8 @@ API Key 申请：[labs.aholo3d.cn](https://labs.aholo3d.cn)（中国区）· [la
 
 见 [examples/](examples/) 目录，运行方式见[完整文档](https://labs.aholo3d.cn/api-docs/sdk/java#示例代码)。
 
+- `WorldReconstruct` — `.mp4`/`.mov`（`video`）或 Insta360 `.insv`（`insv`）；生成任务使用 `GenerateWorldResource`
+
 ## 许可证
 
 [MIT](../LICENSE)

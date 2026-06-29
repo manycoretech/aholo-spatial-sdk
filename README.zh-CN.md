@@ -164,6 +164,40 @@ WorldDetail result = world.waitFor(created.worldId());
 System.out.println(result);
 ```
 
+### 世界任务输入资源
+
+| API | 资源 `type` | 格式说明 |
+|-----|-------------|----------|
+| `reconstructions.create` | `image` \| `video` \| `insv` | 图片：≥20 张；视频：`.mp4`/`.mov`；Insta360：`.insv` |
+| `generations.create` | 仅 `image` | 最多 1 张图，可与 `prompt` 组合 |
+
+生成任务附带参考图（使用 `image`，不可用 `video`/`insv`）：
+
+```typescript
+await world.generations.create({
+  prompt: '现代简约客厅',
+  resources: [{ url: uploaded.url, type: 'image' }],
+});
+```
+
+```python
+world.generations.create(
+    prompt='现代简约客厅',
+    resources=[{'url': uploaded.url, 'type': 'image'}],
+)
+```
+
+```java
+import com.manycoreapis.sdk.world.model.GenerationCreateParams;
+import com.manycoreapis.sdk.world.model.GenerateWorldResource;
+
+world.generations().create(
+    GenerationCreateParams.builder()
+        .prompt("现代简约客厅")
+        .addResource(GenerateWorldResource.of(uploaded.url()))
+        .build());
+```
+
 ## 错误处理
 
 SDK 会抛出以下类型的异常：

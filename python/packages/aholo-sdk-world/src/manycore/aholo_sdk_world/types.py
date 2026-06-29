@@ -5,7 +5,8 @@ from typing import List, Literal, TypedDict
 WorldTaskStatus = Literal["PENDING", "PREPROCESSING", "RUNNING", "SUCCEEDED", "FAILED", "CANCELED", "TIMEOUT", "REJECTED"]
 WorldScene = Literal["model", "space"]
 WorldTaskQuality = Literal["low", "normal", "high"]
-WorldResourceType = Literal["image", "video"]
+WorldResourceType = Literal["image", "video", "insv"]
+WorldGenResourceType = Literal["image"]
 WorldUpAxis = Literal["Y", "Z"]
 
 WORLD_TERMINAL_FAILURE_STATUSES = frozenset({"FAILED", "CANCELED", "TIMEOUT", "REJECTED"})
@@ -18,6 +19,13 @@ class _WorldResourceItemBase(TypedDict):
 
 class WorldResourceItem(_WorldResourceItemBase, total=False):
     type: WorldResourceType
+
+
+class _GenerateWorldResourceItemBase(TypedDict):
+    url: str
+
+class GenerateWorldResourceItem(_GenerateWorldResourceItemBase, total=False):
+    type: WorldGenResourceType
 
 
 class _WorldAsyncOperationBase(TypedDict):

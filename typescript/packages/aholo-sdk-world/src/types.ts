@@ -4,8 +4,9 @@ import type { components } from './generated/world-api.js';
 
 // --- Request / response types (direct from spec) ---
 export type CreateWorldRequest    = components['schemas']['CreateWorldRequest'];
-export type GenerateWorldRequest  = components['schemas']['GenerateWorldRequest'];
-export type WorldAsyncOperation   = components['schemas']['WorldAsyncOperation'];
+export type GenerateWorldRequest      = components['schemas']['GenerateWorldRequest'];
+export type GenerateWorldResourceItem = components['schemas']['GenerateWorldResourceItem'];
+export type WorldAsyncOperation       = components['schemas']['WorldAsyncOperation'];
 export type WorldResourceItem     = components['schemas']['WorldResourceItem'];
 export type WorldDetail           = components['schemas']['WorldDetail'];
 export type WorldPagedList        = components['schemas']['WorldPagedList'];
@@ -19,7 +20,8 @@ export type WorldAssetBundle        = components['schemas']['WorldAssetBundle'];
 // --- Enum aliases (spec uses longer internal names) ---
 export type WorldScene        = components['schemas']['WorldOpenApiProjectScene'];
 export type WorldTaskQuality  = components['schemas']['WorldOpenApiTaskQuality'];
-export type WorldResourceType = components['schemas']['WorldOpenApiResourceType'];
+export type WorldResourceType    = components['schemas']['WorldOpenApiResourceType'];
+export type WorldGenResourceType = components['schemas']['WorldOpenApiGenResourceType'];
 export type WorldTaskStatus   = components['schemas']['WorldOpenApiTaskStatus'];
 export type WorldUpAxis       = components['schemas']['WorldOpenApiUpAxis'];
 

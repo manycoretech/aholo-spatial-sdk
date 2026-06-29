@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-06-29
+
+### Added
+
+- **World API**: Reconstruction supports `insv` (Insta360 panorama video, `.insv` extension) alongside `image` and `video`.
+- **TypeScript / Python**: `GenerateWorldResourceItem` and `WorldGenResourceType` for generation tasks (reference images only).
+- **Java**: `GenerateWorldResource` model for generation create params.
+
+### Changed
+
+- Synced World OpenAPI spec across TypeScript, Python, and Java; reconstruction and generation resource schemas are now separate types.
+- Bumped **world** packages only (`@manycore/aholo-sdk-world`, `manycore-aholo-sdk-world`, `com.manycoreapis:aholo-sdk-world`) to **1.3.0** (core, asset, lux3d remain at 1.2.0).
+- World reconstruct examples (TypeScript, Python, Java): auto-select `video` or `insv` from file extension.
+
+### Breaking Changes
+
+- **Java**: `GenerationCreateParams.resources` now uses `List<GenerateWorldResource>` instead of `List<WorldResource>` (generation accepts `image` only).
+
 ## [1.2.0] - 2026-06-11
 
 ### Added
@@ -39,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Repository initialized.
 
+[1.3.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/world/v1.2.0...world/v1.3.0
 [1.2.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/world/v1.1.0...dae395e
 [1.1.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/1c27d39...d9b09f2
 [1.0.0]: https://github.com/manycoretech/aholo-spatial-sdk/commit/1c27d39

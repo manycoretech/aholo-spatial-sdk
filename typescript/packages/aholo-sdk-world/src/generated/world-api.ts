@@ -15,7 +15,8 @@ export interface paths {
         put?: never;
         /**
          * 创建 3DGS 世界重建任务
-         * @description 异步创建一条 3DGS 世界重建任务。受理成功后返回 `WorldAsyncOperation`，仅含 `worldId`，与「查询世界详情」路径 `{worldId}` 一致。**输入规则**：若 `resources` 中含有图片类资源（`type=image` 或省略 `type`），则图片类条数须 **至少 20 条**；仅使用视频时请将每条资源的 `type` 设为 `video`（此时不按「至少 20 张图」限制）。
+         * @description 异步创建一条 3DGS 世界重建任务。受理成功后返回 `WorldAsyncOperation`，仅含 `worldId`，与「查询世界详情」路径 `{worldId}` 一致。**资源格式**：image：.jpg / .jpeg / .png / .webp；video：.mp4 / .mov；insv：.insv。
+         *     **输入规则**：若 `resources` 中含有图片类资源（`type=image` 或省略 `type`），则图片类条数须 **至少 20 条**；仅使用视频时请设 `type=video`，Insta360 全景视频请设 `type=insv`（均不触发「至少 20 张图」限制）。
          */
         post: operations["createWorld"];
         delete?: never;
@@ -35,7 +36,7 @@ export interface paths {
         put?: never;
         /**
          * 创建 3DGS 世界生成任务
-         * @description 异步创建一条3DGS 世界生成任务（Spatial Gen）。当前 **室内空间** 场景效果更成熟、更稳定，建议优先用于室内。也允许提交 **非室内** 类文案或素材，但非室内生成仍处于 **Beta**，质量与一致性可能明显弱于室内，请按需评估风险。受理成功后返回 `WorldAsyncOperation`（仅含 `worldId`）。若 `resources` 中含图片类资源（`type` 为 image 或未传时按图片处理），最多允许 1 张图片。
+         * @description 异步创建一条3DGS 世界生成任务（Spatial Gen）。当前 **室内空间** 场景效果更成熟、更稳定，建议优先用于室内。也允许提交 **非室内** 类文案或素材，但非室内生成仍处于 **Beta**，质量与一致性可能明显弱于室内，请按需评估风险。受理成功后返回 `WorldAsyncOperation`（仅含 `worldId`）。支持纯文案、单张图片或图文组合。若 `resources` 中含图片，最多允许 1 张（image：.jpg / .jpeg / .png / .webp。）。
          */
         post: operations["generateWorld"];
         delete?: never;
@@ -90,7 +91,8 @@ export interface components {
     schemas: {
         /**
          * @description 创建 3DGS 世界重建任务的请求体。`scene` 仅支持 model 与 space；`taskQuality` 含义见 `WorldOpenApiTaskQuality`（low 极速预览 / normal 标准 / high 专业）。
-         *     **资源条数**：若 `resources` 中出现图片类资源（`type=image` 或省略 `type`，后者按图片计），则图片类至少 **20 条**；若仅使用视频，请为每条资源设置 `type=video`（不触发「至少 20 张图」规则）。
+         *     **资源格式**：image：.jpg / .jpeg / .png / .webp；video：.mp4 / .mov；insv：.insv。
+         *     **资源条数**：若 `resources` 中出现图片类资源（`type=image` 或省略 `type`，后者按图片计），则图片类至少 **20 条**；若仅使用视频或 Insta360 全景视频，请为每条资源设置 `type=video` 或 `type=insv`（不触发「至少 20 张图」规则）。
          */
         CreateWorldRequest: {
             /**
@@ -103,7 +105,7 @@ export interface components {
              * @example https://cdn.example.com/cover/custom-cover.jpg
              */
             cover?: string;
-            /** @description 输入资源列表，至少 1 条。含图片时须至少 20 条图片类（`type=image` 或省略 type）；纯视频请显式 `type=video`。 */
+            /** @description 输入资源列表，至少 1 条。格式见 CreateWorldRequest 说明（image：.jpg / .jpeg / .png / .webp；video：.mp4 / .mov；insv：.insv。）。含图片时须至少 20 条图片类（`type=image` 或省略 type）；纯视频请显式 `type=video`；Insta360 全景视频请显式 `type=insv`。 */
             resources: components["schemas"]["WorldResourceItem"][];
             /**
              * @description 是否对上传资源进行抠图。`true` 开启；省略或 `false` 不抠图。
@@ -120,21 +122,21 @@ export interface components {
          */
         WorldOpenApiProjectScene: "model" | "space";
         /**
-         * @description 输入资源类型，对应业务 ResourceTypeEnum.type。image：图片（映射 IMAGES）；video：视频（映射 VIDEO）。未传时后端按图片类型（IMAGES）处理；兼容历史 JSON 值 `images`。
+         * @description 输入资源类型。image：图片，支持 .jpg / .jpeg / .png / .webp；video：普通视频，支持 .mp4 / .mov；insv：Insta360 全景视频，支持 .insv。
          * @example image
          * @enum {string}
          */
-        WorldOpenApiResourceType: "image" | "video";
+        WorldOpenApiResourceType: "image" | "video" | "insv";
         /**
          * @description 3DGS 重建任务质量档位。low：极速预览；normal：标准；high：专业。
          * @example high
          * @enum {string}
          */
         WorldOpenApiTaskQuality: "low" | "normal" | "high";
-        /** @description 单条输入资源（地址与类型）。用于「创建重建任务」时：未传 `type` 按 **图片** 计；纯走视频请传 `video`。 */
+        /** @description 重建任务单条输入资源。未传 `type` 按图片计；普通视频传 `video`；Insta360 全景视频传 `insv`。image：.jpg / .jpeg / .png / .webp；video：.mp4 / .mov；insv：.insv。 */
         WorldResourceItem: {
             /**
-             * @description 资源地址 URL；可接受的媒体形态与 type 及下游处理一致。
+             * @description 资源地址 URL；扩展名须与 `type` 一致（image：.jpg / .jpeg / .png / .webp；video：.mp4 / .mov；insv：.insv。）。
              * @example https://cdn.example.com/input/room-001.jpg
              */
             url: string;
@@ -370,7 +372,7 @@ export interface components {
         };
         /**
          * @description 创建 3DGS「生成世界」任务的请求体；支持纯文案、单张图片或图文组合。室内场景效果更成熟；非室内为 Beta（详见同路径 POST 说明）。
-         *     至少需提供非空 prompt 或至少一条资源；其中图片类资源（type为 image 或未传时按图片处理）至多 1 张。
+         *     至少需提供非空 prompt 或至少一条图片资源（至多 1 张）；image：.jpg / .jpeg / .png / .webp。
          */
         GenerateWorldRequest: {
             /**
@@ -383,14 +385,29 @@ export interface components {
              * @example https://cdn.example.com/cover/gen-cover.jpg
              */
             cover?: string;
-            /** @description 输入资源列表；与 prompt 至少满足其一。图片类条目至多 1 条；未传 type 时按图片处理。 */
-            resources?: components["schemas"]["WorldResourceItem"][];
+            /** @description 输入资源列表；与 prompt 至少满足其一。仅支持图片，至多 1 条；未传 type 时按图片处理。image：.jpg / .jpeg / .png / .webp。 */
+            resources?: components["schemas"]["GenerateWorldResourceItem"][];
             /**
              * @description 文本提示词；可与 resources 同时提供。
              * @example 现代简约风格，阳光充足的客厅
              */
             prompt?: string;
         };
+        /** @description 生成任务单条输入资源（图片）。未传 `type` 时按图片处理。image：.jpg / .jpeg / .png / .webp。 */
+        GenerateWorldResourceItem: {
+            /**
+             * @description 图片资源 URL；扩展名须为 image：.jpg / .jpeg / .png / .webp。
+             * @example https://cdn.example.com/input/room.jpg
+             */
+            url: string;
+            type?: components["schemas"]["WorldOpenApiGenResourceType"];
+        };
+        /**
+         * @description 生成任务输入资源类型，仅支持 image（图片），支持 .jpg / .jpeg / .png / .webp。
+         * @example image
+         * @enum {string}
+         */
+        WorldOpenApiGenResourceType: "image";
     };
     responses: never;
     parameters: never;
@@ -463,7 +480,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        /** @description 生成世界请求体。图片类输入至多 1 条（与 `Project3dgsGenCreateWorld` 校验一致）。 */
+        /** @description 生成世界请求体。支持纯文案、单张图片或图文组合。至多 1 张图片（image：.jpg / .jpeg / .png / .webp。）。 */
         requestBody: {
             content: {
                 "application/json": components["schemas"]["GenerateWorldRequest"];

@@ -20,7 +20,7 @@ public final class GenerationCreateParams {
     private final String cover;
 
     @JsonProperty("resources")
-    private final List<WorldResource> resources;
+    private final List<GenerateWorldResource> resources;
 
     @JsonProperty("prompt")
     private final String prompt;
@@ -39,12 +39,12 @@ public final class GenerationCreateParams {
     public Optional<String> name()                      { return Optional.ofNullable(name); }
     public Optional<String> cover()                     { return Optional.ofNullable(cover); }
     public Optional<String> prompt()                    { return Optional.ofNullable(prompt); }
-    public Optional<List<WorldResource>> resources()    { return Optional.ofNullable(resources); }
+    public Optional<List<GenerateWorldResource>> resources()    { return Optional.ofNullable(resources); }
 
     public static final class Builder {
         private String name;
         private String cover;
-        private final List<WorldResource> resources = new ArrayList<>();
+        private final List<GenerateWorldResource> resources = new ArrayList<>();
         private String prompt;
 
         private Builder() {}
@@ -53,20 +53,20 @@ public final class GenerationCreateParams {
         public Builder cover(String cover)   { this.cover = cover; return this; }
         public Builder prompt(String prompt) { this.prompt = prompt; return this; }
 
-        public Builder resources(List<WorldResource> resources) {
+        public Builder resources(List<GenerateWorldResource> resources) {
             Objects.requireNonNull(resources, "resources");
             this.resources.clear();
             this.resources.addAll(resources);
             return this;
         }
 
-        public Builder addResource(WorldResource resource) {
+        public Builder addResource(GenerateWorldResource resource) {
             this.resources.add(Objects.requireNonNull(resource, "resource"));
             return this;
         }
 
         public Builder addResource(String url, String type) {
-            return addResource(WorldResource.of(url, type));
+            return addResource(GenerateWorldResource.of(url, type));
         }
 
         public GenerationCreateParams build() {

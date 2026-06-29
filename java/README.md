@@ -62,6 +62,8 @@ Apply for an API Key: [labs.aholo3d.cn](https://labs.aholo3d.cn) (China) · [lab
 
 See [examples/](examples/) for runnable Java classes. Run instructions are in the [full documentation](https://labs.aholo3d.com/api-docs/en/sdk/java).
 
+- `WorldReconstruct` — `.mp4`/`.mov` (`video`) or Insta360 `.insv` (`insv`); generation uses `GenerateWorldResource`
+
 ## License
 
 [MIT](../LICENSE)

@@ -11,27 +11,33 @@ import com.manycoreapis.sdk.world.model.WorldDetail;
 import java.nio.file.Paths;
 
 /**
- * Minimal example: upload a video, create a 3DGS reconstruction, poll until done.
+ * Minimal example: upload media, create a 3DGS reconstruction, poll until done.
  *
- * Usage:
+ * <p>Supported inputs: {@code .mp4} / {@code .mov} (type {@code video}),
+ * Insta360 {@code .insv} (type {@code insv}).
+ *
+ * <p>Usage:
+ * <pre>
  *   AHOLO_API_KEY=xxx mvn exec:java -pl examples \
  *     -Dexec.mainClass=com.manycoreapis.sdk.examples.WorldReconstruct \
  *     -Dexec.args="/path/to/room.mp4"
+ * </pre>
  */
 public class WorldReconstruct {
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
-            System.err.println("Usage: WorldReconstruct <video-path>");
+            System.err.println("Usage: WorldReconstruct <media-path>");
             System.exit(1);
         }
 
         String filePath = args[0];
+        String resourceType = reconstructionResourceType(filePath);
         String region = System.getenv().getOrDefault("AHOLO_REGION", "cn");
         AholoClientConfig config = AholoClientConfig.ofRegion(region);
         AssetClient asset = AssetClient.create(config);
         WorldClient world = WorldClient.create(config);
 
-        System.out.println("Uploading " + filePath + " ...");
+        System.out.printf("Uploading %s (type=%s) ...%n", filePath, resourceType);
         long t0 = System.currentTimeMillis();
 
         UploadResult uploaded = asset.uploadFile(Paths.get(filePath), (uploadedBytes, total) -> {
@@ -47,7 +53,7 @@ public class WorldReconstruct {
         WorldAsyncOperation created = world.reconstructions().create(
                 ReconstructionCreateParams.builder()
                         .name("SDK reconstruction demo")
-                        .addResource(uploaded.url(), "video")
+                        .addResource(uploaded.url(), resourceType)
                         .taskQuality("normal")
                         .scene("model")
                         .build()
@@ -67,5 +73,16 @@ public class WorldReconstruct {
                         })
                 )
         );
+    }
+
+    private static String reconstructionResourceType(String filePath) {
+        String lower = filePath.toLowerCase();
+        if (lower.endsWith(".insv")) {
+            return "insv";
+        }
+        if (lower.endsWith(".mp4") || lower.endsWith(".mov")) {
+            return "video";
+        }
+        throw new IllegalArgumentException("Unsupported file. Use .mp4, .mov, or .insv");
     }
 }

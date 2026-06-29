@@ -151,6 +151,40 @@ WorldDetail result = world.waitFor(created.worldId());
 System.out.println(result);
 ```
 
+### World input resources
+
+| API | Resource `type` | Formats |
+|-----|-----------------|---------|
+| `reconstructions.create` | `image` \| `video` \| `insv` | Images: ≥20 × `.jpg`/`.jpeg`/`.png`/`.webp`; video: `.mp4`/`.mov`; Insta360: `.insv` |
+| `generations.create` | `image` only | At most 1 image; combine with `prompt` |
+
+Generation with a reference image (use `image`, not `video`/`insv`):
+
+```typescript
+await world.generations.create({
+  prompt: 'Modern living room',
+  resources: [{ url: uploaded.url, type: 'image' }],
+});
+```
+
+```python
+world.generations.create(
+    prompt='Modern living room',
+    resources=[{'url': uploaded.url, 'type': 'image'}],
+)
+```
+
+```java
+import com.manycoreapis.sdk.world.model.GenerationCreateParams;
+import com.manycoreapis.sdk.world.model.GenerateWorldResource;
+
+world.generations().create(
+    GenerationCreateParams.builder()
+        .prompt("Modern living room")
+        .addResource(GenerateWorldResource.of(uploaded.url()))
+        .build());
+```
+
 ## Error Handling
 
 The SDK throws typed errors:

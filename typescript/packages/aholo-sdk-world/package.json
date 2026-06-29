@@ -1,6 +1,6 @@
 {
   "name": "@manycore/aholo-sdk-world",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Aholo 3DGS world reconstruction and generation client",
   "license": "MIT",
   "repository": {
