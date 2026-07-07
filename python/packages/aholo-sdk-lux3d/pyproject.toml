@@ -16,4 +16,4 @@ Repository = "https://github.com/manycoretech/aholo-spatial-sdk"
 Issues = "https://github.com/manycoretech/aholo-spatial-sdk/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/manycore/aholo_sdk_lux3d"]
+packages = ["src/manycore"]
