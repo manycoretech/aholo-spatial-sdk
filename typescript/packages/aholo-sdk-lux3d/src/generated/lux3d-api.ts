@@ -14,12 +14,11 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create Image-to-3D Task (International)
-         * @description Create an image-to-3D task. Input an image and output an async task. Returns task ID (taskid) on success, which can be used to query task status and results.
-         *     This is the international endpoint with /global path prefix.
-         *     If version parameter is not provided, v2.0-preview is used by default.
+         * 创建图生3D任务
+         * @description 创建图生3D任务，输入图片，输出异步任务。请求成功后返回任务 ID taskid，后续可通过查询接口获取任务状态和结果。
+         *     若不传 version 参数，系统默认使用 v3.0-standard 版本。
          */
-        post: operations["createImgTo3dTaskGlobal"];
+        post: operations["createImgTo3dTask"];
         delete?: never;
         options?: never;
         head?: never;
@@ -36,12 +35,11 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create Text-to-3D Task (International)
-         * @description Create a text-to-3D task. Input text or text+image and output an async task. Returns task ID (taskid) on success, which can be used to query task status and results.
-         *     This is the international endpoint with /global path prefix.
-         *     If version parameter is not provided, v2.0-preview is used by default.
+         * 创建文生3D任务
+         * @description 创建文生3D任务，输入文本或文本+图片，输出异步任务。请求成功后返回任务 ID taskid，后续可通过查询接口获取任务状态和结果。
+         *     若不传 version 参数，系统默认使用 v3.0-standard 版本。
          */
-        post: operations["createTextTo3dTaskGlobal"];
+        post: operations["createTextTo3dTask"];
         delete?: never;
         options?: never;
         head?: never;
@@ -58,12 +56,11 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create Material Transfer Task (International)
-         * @description Create a material transfer task. Input an image and model URL, output an async task with the repainted model. Returns task ID (taskid) on success, which can be used to query task status and results.
-         *     This is the international endpoint with /global path prefix.
-         *     If version parameter is not provided, v2.0-preview is used by default.
+         * 创建模型材质重绘任务
+         * @description 创建模型材质重绘任务，输入图片和模型URL，输出重绘后的模型对应的异步任务。请求成功后返回任务 ID taskid，后续可通过查询接口获取任务状态和结果。
+         *     若不传 version 参数，系统默认使用 v3.0-standard 版本。
          */
-        post: operations["createMaterialTransferTaskGlobal"];
+        post: operations["createMaterialTransferTask"];
         delete?: never;
         options?: never;
         head?: never;
@@ -78,16 +75,17 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Query Generation Task (International)
-         * @description Query image-to-3D, text-to-3D or material transfer task status and results by taskid. The output content in the query result is valid for 2 hours. It is recommended to retrieve and save the results as soon as the task succeeds.
-         *     It is recommended to poll the task status every 10-15 seconds.
-         *     This is the international endpoint with /global path prefix.
+         * 查询生成任务
+         * @description 根据 taskid 查询图生3D、文生3D或模型材质重绘任务状态和结果。查询结果中的输出内容有效期为 2 小时，建议在任务成功后尽快获取并保存结果。
+         *     建议每 10-15 秒轮询查询任务状态。
          *
-         *     Version output differences:
-         *     - v1.0-pro: First-generation model with complete PBR material properties output, supports transparent material generation. Single format output, returns only lux3d format model URL
-         *     - v2.0-preview (default): New model architecture with enhanced text and texture detail preservation, no transparent materials. Multiple format output, returns .zip, .glb, .usdz formats
+         *     版本输出差异：
+         *     - v1.0-pro：首版大模型，具有完整的 PBR 材质属性输出，支持透明材质生成。单格式输出，仅返回 lux3d 格式模型 URL
+         *     - v2.0-preview：2.0 模型架构，重点拓展了对文字、纹理细节的保持能力，不含透明材质。多格式输出，返回 .zip、.glb、.usdz 三种格式
+         *     - v3.0-standard（默认）：3.0 全新模型架构，重点拓展对文字、纹理细节的保持能力，支持五格式输出。返回 .zip、.glb、.usdz、_obj.zip、_fbx.zip 五种格式，依次对应 outputs[0..4]；默认下载 outputs[0]，可通过 ?format=zip / glb / usdz / obj_zip / fbx_zip 切换
+         *     v3.0-standard 中，未通过 needUsdz / needObj / needFbx 请求的可选格式会在对应 outputs 位置返回 NOT_REQUESTED，占位表示该格式未请求，并非任务失败。
          */
-        get: operations["getTaskGlobal"];
+        get: operations["getTask"];
         put?: never;
         post?: never;
         delete?: never;
@@ -100,113 +98,179 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description Image-to-3D task request body. */
+        /** @description 图生3D任务请求体。 */
         ImgTo3dRequest: {
             /**
-             * @description Image Base64, recommended to use complete Data URL format, e.g. data:image/png;base64,...
+             * @description 图片 Base64，建议使用完整 Data URL 格式，例如 data:image/png;base64,...
              * @example data:image/png;base64,BASE64_IMAGE_STRING
              */
             img: string;
             /**
-             * @description Lux3D version, supports v2.0-preview (default), v1.0-pro. If not provided, v2.0-preview is used by default
-             * @default v2.0-preview
-             * @example v2.0-preview
+             * @description Lux3D 版本，支持 v3.0-standard（默认）、v2.0-preview、v1.0-pro。不传则默认使用 v3.0-standard
+             * @default v3.0-standard
+             * @example v3.0-standard
              * @enum {string}
              */
-            version?: "v2.0-preview" | "v1.0-pro";
+            version?: "v3.0-standard" | "v2.0-preview" | "v1.0-pro";
+            /**
+             * @description 可选，目标生成面数。仅 v3.0-standard 生效，v2.0-preview / v1.0-pro 忽略此参数并按各自默认面数生成。取值范围 [10000, 500000]，不传则默认 60000。
+             * @default 60000
+             * @example 60000
+             */
+            faceCount?: number;
+            /**
+             * @description 可选，是否导出 USDZ。zip 与 glb 恒定输出，不受此字段控制。不传或传 null 则默认 false（不导出）。
+             * @default false
+             * @example false
+             */
+            needUsdz?: boolean;
+            /**
+             * @description 可选，是否导出 OBJ zip 包。不传或传 null 则默认 false（不导出）。
+             * @default false
+             * @example false
+             */
+            needObj?: boolean;
+            /**
+             * @description 可选，是否导出 FBX zip 包。不传或传 null 则默认 false（不导出）。
+             * @default false
+             * @example false
+             */
+            needFbx?: boolean;
         };
-        /** @description Text-to-3D task request body. */
+        /** @description 文生3D任务请求体。 */
         TextTo3dRequest: {
             /**
-             * @description Text prompt
-             * @example Generate a high-quality 3D wooden chair model
+             * @description 文本提示词
+             * @example 生成一个高质量的3D木椅模型
              */
             prompt: string;
             /**
-             * @description Style type, supports photorealistic (default), cartoon, anime, hand_painted, cyberpunk, fantasy, glass. If not provided, photorealistic is used by default
+             * @description 风格类型，支持 photorealistic（写实，默认值）、cartoon（卡通）、anime（二次元）、hand_painted（手绘）、cyberpunk（赛博朋克）、fantasy（奇幻）、glass（玻璃质感）。不传则默认使用 photorealistic
              * @default photorealistic
              * @example photorealistic
              * @enum {string}
              */
             style?: "photorealistic" | "cartoon" | "anime" | "hand_painted" | "cyberpunk" | "fantasy" | "glass";
             /**
-             * @description Reference image, recommended to use complete Data URL format (optional)
+             * @description 参考图，建议使用完整 Data URL 格式（可选）
              * @example data:image/png;base64,BASE64_IMAGE_STRING
              */
             img?: string;
             /**
-             * @description Lux3D version, supports v2.0-preview (default), v1.0-pro. If not provided, v2.0-preview is used by default
-             * @default v2.0-preview
-             * @example v2.0-preview
+             * @description Lux3D 版本，支持 v3.0-standard（默认）、v2.0-preview、v1.0-pro。不传则默认使用 v3.0-standard
+             * @default v3.0-standard
+             * @example v3.0-standard
              * @enum {string}
              */
-            version?: "v2.0-preview" | "v1.0-pro";
+            version?: "v3.0-standard" | "v2.0-preview" | "v1.0-pro";
+            /**
+             * @description 可选，目标生成面数。仅 v3.0-standard 生效，v2.0-preview / v1.0-pro 忽略此参数并按各自默认面数生成。取值范围 [10000, 500000]，不传则默认 60000。
+             * @default 60000
+             * @example 60000
+             */
+            faceCount?: number;
+            /**
+             * @description 可选，是否导出 USDZ。zip 与 glb 恒定输出，不受此字段控制。不传或传 null 则默认 false（不导出）。
+             * @default false
+             * @example false
+             */
+            needUsdz?: boolean;
+            /**
+             * @description 可选，是否导出 OBJ zip 包。不传或传 null 则默认 false（不导出）。
+             * @default false
+             * @example false
+             */
+            needObj?: boolean;
+            /**
+             * @description 可选，是否导出 FBX zip 包。不传或传 null 则默认 false（不导出）。
+             * @default false
+             * @example false
+             */
+            needFbx?: boolean;
         };
-        /** @description Material transfer task request body. */
+        /** @description 模型材质重绘任务请求体。 */
         MaterialTransferRequest: {
             /**
-             * @description Image URL or Base64 for material reference
+             * @description 图片链接或 Base64，用于材质参考图
              * @example data:image/png;base64,BASE64_IMAGE_STRING
              */
             img: string;
             /**
-             * @description Model GLB file URL
+             * @description 模型 GLB 文件地址
              * @example https://example.com/model.glb
              */
             meshUrl: string;
             /**
-             * @description Lux3D version, supports v2.0-preview (default), v1.0-pro. If not provided, v2.0-preview is used by default
-             * @default v2.0-preview
-             * @example v2.0-preview
+             * @description Lux3D 版本，支持 v3.0-standard（默认）、v2.0-preview、v1.0-pro。不传则默认使用 v3.0-standard
+             * @default v3.0-standard
+             * @example v3.0-standard
              * @enum {string}
              */
-            version?: "v2.0-preview" | "v1.0-pro";
+            version?: "v3.0-standard" | "v2.0-preview" | "v1.0-pro";
+            /**
+             * @description 可选，是否导出 USDZ。zip 与 glb 恒定输出，不受此字段控制。不传或传 null 则默认 false（不导出）。
+             * @default false
+             * @example false
+             */
+            needUsdz?: boolean;
+            /**
+             * @description 可选，是否导出 OBJ zip 包。不传或传 null 则默认 false（不导出）。
+             * @default false
+             * @example false
+             */
+            needObj?: boolean;
+            /**
+             * @description 可选，是否导出 FBX zip 包。不传或传 null 则默认 false（不导出）。
+             * @default false
+             * @example false
+             */
+            needFbx?: boolean;
         };
-        /** @description Task creation response body. */
+        /** @description 任务创建响应体。 */
         TaskCreateResponse: {
             /**
              * Format: int64
-             * @description Returns taskid
+             * @description 返回 taskid
              * @example 1256173
              */
             d?: number | null;
-            /** @description Message */
+            /** @description 提示信息 */
             m?: string | null;
-            /** @description Status code */
+            /** @description 状态码 */
             c?: string | null;
         };
-        /** @description Task output item. */
+        /** @description 任务输出项。 */
         TaskOutput: {
             /**
-             * @description Result content (model file URL)
+             * @description 结果内容。通常为模型文件 URL；v3.0-standard 中未请求的可选导出格式会返回 NOT_REQUESTED。
              * @example https://cdn.example.com/output/model.lux3d
              */
             content?: string | null;
         };
-        /** @description Task query data. */
+        /** @description 任务查询数据。 */
         TaskQueryData: {
             /**
              * Format: int64
-             * @description Task ID
+             * @description 任务ID
              * @example 1389513
              */
             taskId?: number;
-            /** @description Output list. v1.0-pro version returns single format output (lux3d), v2.0-preview version returns multiple format output (.zip, .glb, .usdz) */
+            /** @description 输出列表。v1.0-pro 版本返回单格式输出（lux3d），v2.0-preview 版本返回多格式输出（.zip、.glb、.usdz），v3.0-standard 版本返回五格式输出（.zip、.glb、.usdz、_obj.zip、_fbx.zip，依次对应 outputs[0..4]，默认下载 outputs[0]）。未请求的可选格式返回 NOT_REQUESTED。 */
             outputs?: components["schemas"]["TaskOutput"][];
             /**
              * Format: int32
-             * @description Task status: 0-initialized, 1-in progress, 3-success, 4-failed
+             * @description 任务状态：0-初始化，1-进行中，3-成功，4-失败
              * @example 3
              * @enum {integer}
              */
             status?: 0 | 1 | 3 | 4;
         };
-        /** @description Task query response body. */
+        /** @description 任务查询响应体。 */
         TaskQueryResponse: {
             d?: components["schemas"]["TaskQueryData"];
-            /** @description Message */
+            /** @description 提示信息 */
             m?: string | null;
-            /** @description Status code */
+            /** @description 状态码 */
             c?: string | null;
         };
     };
@@ -218,21 +282,21 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    createImgTo3dTaskGlobal: {
+    createImgTo3dTask: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Image-to-3D task request body. */
+        /** @description 图生3D任务请求体。 */
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ImgTo3dRequest"];
             };
         };
         responses: {
-            /** @description Returns task ID on success. */
+            /** @description 成功时返回任务ID。 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -241,7 +305,7 @@ export interface operations {
                     "application/json": components["schemas"]["TaskCreateResponse"];
                 };
             };
-            /** @description Missing or invalid Authorization header, authentication failed */
+            /** @description 未携带或无效的 Authorization，鉴权失败 */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -250,7 +314,7 @@ export interface operations {
                     "application/json": components["schemas"]["TaskCreateResponse"];
                 };
             };
-            /** @description Internal server error */
+            /** @description 服务端内部错误 */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -261,21 +325,21 @@ export interface operations {
             };
         };
     };
-    createTextTo3dTaskGlobal: {
+    createTextTo3dTask: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Text-to-3D task request body. */
+        /** @description 文生3D任务请求体。 */
         requestBody: {
             content: {
                 "application/json": components["schemas"]["TextTo3dRequest"];
             };
         };
         responses: {
-            /** @description Returns task ID on success. */
+            /** @description 成功时返回任务ID。 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -284,7 +348,7 @@ export interface operations {
                     "application/json": components["schemas"]["TaskCreateResponse"];
                 };
             };
-            /** @description Missing or invalid Authorization header, authentication failed */
+            /** @description 未携带或无效的 Authorization，鉴权失败 */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -293,7 +357,7 @@ export interface operations {
                     "application/json": components["schemas"]["TaskCreateResponse"];
                 };
             };
-            /** @description Internal server error */
+            /** @description 服务端内部错误 */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -304,21 +368,21 @@ export interface operations {
             };
         };
     };
-    createMaterialTransferTaskGlobal: {
+    createMaterialTransferTask: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Material transfer task request body. */
+        /** @description 模型材质重绘任务请求体。 */
         requestBody: {
             content: {
                 "application/json": components["schemas"]["MaterialTransferRequest"];
             };
         };
         responses: {
-            /** @description Returns task ID on success. */
+            /** @description 成功时返回任务ID。 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -327,7 +391,7 @@ export interface operations {
                     "application/json": components["schemas"]["TaskCreateResponse"];
                 };
             };
-            /** @description Missing or invalid Authorization header, authentication failed */
+            /** @description 未携带或无效的 Authorization，鉴权失败 */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -336,7 +400,7 @@ export interface operations {
                     "application/json": components["schemas"]["TaskCreateResponse"];
                 };
             };
-            /** @description Internal server error */
+            /** @description 服务端内部错误 */
             500: {
                 headers: {
                     [name: string]: unknown;
@@ -347,11 +411,11 @@ export interface operations {
             };
         };
     };
-    getTaskGlobal: {
+    getTask: {
         parameters: {
             query: {
                 /**
-                 * @description Task ID
+                 * @description 任务ID
                  * @example 1389513
                  */
                 taskid: string;
@@ -362,7 +426,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Returns task status and results on success. */
+            /** @description 成功时返回任务状态和结果。 */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -371,7 +435,7 @@ export interface operations {
                     "application/json": components["schemas"]["TaskQueryResponse"];
                 };
             };
-            /** @description Missing or invalid Authorization header, authentication failed */
+            /** @description 未携带或无效的 Authorization，鉴权失败 */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -380,7 +444,7 @@ export interface operations {
                     "application/json": components["schemas"]["TaskQueryResponse"];
                 };
             };
-            /** @description Internal server error */
+            /** @description 服务端内部错误 */
             500: {
                 headers: {
                     [name: string]: unknown;

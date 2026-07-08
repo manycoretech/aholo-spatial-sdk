@@ -2,8 +2,9 @@
 """
 Minimal example: image-to-3D with Lux3D, poll until model URLs are ready.
 
-v2.0-preview (default): returns .zip, .glb and .usdz formats
-v1.0-pro:               returns a single .lux3d format
+v3.0-standard (default): zip + glb + optional usdz/obj/fbx (outputs[0..4])
+v2.0-preview:              zip + glb + usdz
+v1.0-pro:                  single .lux3d format
 
 Usage: AHOLO_API_KEY=xxx python lux3d_img_to_3d.py ./chair.png
 """
@@ -28,6 +29,6 @@ print(f"taskId={task_id}, polling...")
 t0 = time.monotonic()
 result = lux3d.tasks.wait_for(task_id)
 print(f"Task complete ({int((time.monotonic() - t0) * 1000)}ms)")
-# v2.0-preview outputs: [zip, glb, usdz]
+# v3.0-standard outputs: [zip, glb, usdz?, obj?, fbx?] — optional slots may be NOT_REQUESTED
 for output in result.get("outputs", []):
     print(output.get("content"))

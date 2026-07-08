@@ -25,7 +25,7 @@ Set `AHOLO_API_KEY` env var, or pass `apiKey` in the config.
 ```typescript
 const taskId = await lux3d.imgTo3d.create({ img: 'https://example.com/object.jpg' });
 const result = await lux3d.tasks.waitFor(taskId);
-console.log(result.outputs[0]?.content); // download URL
+console.log(result.outputs[0]?.content); // default .zip download URL
 ```
 
 ### Image to 3D (from local file)
@@ -33,6 +33,17 @@ console.log(result.outputs[0]?.content); // download URL
 ```typescript
 const taskId = await lux3d.imgTo3d.createFromFile('./object.jpg');
 const result = await lux3d.tasks.waitFor(taskId);
+```
+
+### v3.0-standard options (face count & optional exports)
+
+```typescript
+const taskId = await lux3d.imgTo3d.create({
+  img: 'https://example.com/object.jpg',
+  faceCount: 80_000,
+  needUsdz: true,
+  needObj: true,
+});
 ```
 
 ### Text to 3D
@@ -56,10 +67,13 @@ const result = await lux3d.tasks.waitFor(taskId);
 
 ### Version differences
 
-| Version | Default | Output formats |
-|---------|---------|----------------|
-| `v2.0-preview` | ✓ | `.zip` + `.glb` + `.usdz` |
-| `v1.0-pro` | | `.lux3d` |
+| Version | Default | Output formats (`outputs` indices) |
+|---------|---------|----------------------------------|
+| `v3.0-standard` | ✓ | `[0]` zip, `[1]` glb, `[2]` usdz, `[3]` obj zip, `[4]` fbx zip |
+| `v2.0-preview` | | `[0]` zip, `[1]` glb, `[2]` usdz |
+| `v1.0-pro` | | `[0]` lux3d only |
+
+For `v3.0-standard`, optional slots (`usdz` / `obj` / `fbx`) return `NOT_REQUESTED` when not requested via `needUsdz` / `needObj` / `needFbx`. `faceCount` (10_000–500_000) applies to v3.0-standard only.
 
 ## Full Documentation
 

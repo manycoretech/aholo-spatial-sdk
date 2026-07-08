@@ -34,3 +34,6 @@ Thumbs.db
 # Internal docs
 SDK-UPDATE-GUIDE.md
 SDK-PUBLISH-GUIDE.md
+
+# Local publish script (contains secrets)
+publish-local.sh

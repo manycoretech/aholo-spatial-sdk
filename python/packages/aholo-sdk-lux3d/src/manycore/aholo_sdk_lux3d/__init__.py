@@ -5,6 +5,7 @@ from .resources.material_transfer import AsyncMaterialTransferResource, Material
 from .resources.tasks import AsyncTasksResource, TasksResource
 from .resources.text_to_3d import AsyncTextTo3dResource, TextTo3dResource
 from .types import (
+    LUX3D_OUTPUT_NOT_REQUESTED,
     LUX3D_STATUS_FAILED,
     LUX3D_STATUS_SUCCESS,
     Lux3dStyle,
@@ -28,6 +29,7 @@ __all__ = [
     "MaterialTransferResource",
     "TasksResource",
     "TextTo3dResource",
+    "LUX3D_OUTPUT_NOT_REQUESTED",
     "LUX3D_STATUS_FAILED",
     "LUX3D_STATUS_SUCCESS",
     "Lux3dStyle",

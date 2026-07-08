@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Lux3D 1.3.0] - 2026-07-08
+
+### Added
+
+- **Lux3D API**: Default model version `v3.0-standard`; version enum now includes `v3.0-standard`, `v2.0-preview`, and `v1.0-pro`.
+- **Lux3D API**: Create-task params `faceCount`, `needUsdz`, `needObj`, `needFbx` (image/text-to-3D and material transfer).
+- **Lux3D API**: v3.0-standard five-format task outputs (`.zip`, `.glb`, `.usdz`, `_obj.zip`, `_fbx.zip`); unrequested optional slots return `NOT_REQUESTED`.
+- **Python**: `LUX3D_OUTPUT_NOT_REQUESTED` constant.
+
+### Changed
+
+- Synced Lux3D OpenAPI spec across TypeScript, Python, and Java.
+- Bumped **lux3d** packages only (`@manycore/aholo-sdk-lux3d`, `manycore-aholo-sdk-lux3d`, `com.manycoreapis:aholo-sdk-lux3d`) to **1.3.0** (core, asset, world unchanged).
+- Lux3D examples and package README updated for v3.0 output layout.
+
 ## [1.3.0] - 2026-06-29
 
 ### Added
@@ -57,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Repository initialized.
 
+[lux3d-1.3.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.2.0...lux3d/v1.3.0
 [1.3.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/world/v1.2.0...world/v1.3.0
 [1.2.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/world/v1.1.0...dae395e
 [1.1.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/1c27d39...d9b09f2

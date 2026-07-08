@@ -1,7 +1,6 @@
 package com.manycoreapis.sdk.lux3d.resources;
 
 import com.manycoreapis.sdk.core.AholoGatewayClient;
-import com.manycoreapis.sdk.core.JsonSupport;
 import com.manycoreapis.sdk.lux3d.model.ImgTo3dCreateParams;
 
 import java.nio.file.Files;
@@ -39,8 +38,11 @@ public class ImgTo3dResource {
         String dataUrl = fileToDataUrl(filePath);
         ImgTo3dCreateParams.Builder builder = ImgTo3dCreateParams.builder().img(dataUrl);
         if (params != null) {
-            String ver = (String) JsonSupport.asMap(params).get("version");
-            if (ver != null) builder.version(ver);
+            params.version().ifPresent(builder::version);
+            params.faceCount().ifPresent(builder::faceCount);
+            params.needUsdz().ifPresent(builder::needUsdz);
+            params.needObj().ifPresent(builder::needObj);
+            params.needFbx().ifPresent(builder::needFbx);
         }
         return create(builder.build());
     }
