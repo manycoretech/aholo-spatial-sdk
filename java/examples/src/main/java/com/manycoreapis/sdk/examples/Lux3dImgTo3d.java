@@ -9,9 +9,9 @@ import java.nio.file.Paths;
 /**
  * Minimal example: image-to-3D with Lux3D, poll until the model URLs are ready.
  *
- * v3.0-standard (default): zip + glb + optional usdz/obj/fbx (outputs[0..4])
- * v2.0-preview:              zip + glb + usdz
- * v1.0-pro:                  single .lux3d format
+ * v3.0-standard / v2.0-preview: zip + glb + optional usdz/obj/fbx via outputFormat
+ * v1.0-pro:                     single ZIP
+ * G1:                           zip / glb / ply via outputFormat
  *
  * Usage:
  *   AHOLO_API_KEY=xxx mvn exec:java -pl examples \
@@ -36,7 +36,7 @@ public class Lux3dImgTo3d {
         long t0 = System.currentTimeMillis();
         TaskResult result = lux3d.tasks().waitFor(taskId);
         System.out.printf("Task complete (%dms)%n", System.currentTimeMillis() - t0);
-        // v3.0-standard outputs: [zip, glb, usdz?, obj?, fbx?] — optional slots may be NOT_REQUESTED
+        // Optional slots may be NOT_REQUESTED when not listed in outputFormat
         result.outputs().forEach(o -> o.content().ifPresent(System.out::println));
     }
 }

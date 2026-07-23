@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from manycore.aholo_sdk_core import assert_cmd_success
 
 from .._paths import lux3d_path
 from ..resources.img_to_3d import _append_create_opts
-from ..types import Lux3dStyle, Lux3dVersion
+from ..types import Lux3dOutputFormat, Lux3dStyle, Lux3dVersion
 
 if TYPE_CHECKING:
     from manycore.aholo_sdk_core import AholoGatewayClient
@@ -25,9 +25,9 @@ class TextTo3dResource:
         img: Optional[str] = None,
         version: Optional[Lux3dVersion] = None,
         face_count: Optional[int] = None,
-        need_usdz: Optional[bool] = None,
-        need_obj: Optional[bool] = None,
-        need_fbx: Optional[bool] = None,
+        output_format: Optional[Sequence[Lux3dOutputFormat]] = None,
+        enable_pbr: Optional[bool] = None,
+        texture_size: Optional[int] = None,
     ) -> int:
         """POST /generate/text-to-3d/task/create"""
         body: dict = {"prompt": prompt}
@@ -39,9 +39,9 @@ class TextTo3dResource:
             body,
             version=version,
             face_count=face_count,
-            need_usdz=need_usdz,
-            need_obj=need_obj,
-            need_fbx=need_fbx,
+            output_format=output_format,
+            enable_pbr=enable_pbr,
+            texture_size=texture_size,
         )
         response = self._gateway.gateway_request(
             method="POST",
@@ -53,7 +53,7 @@ class TextTo3dResource:
 from manycore.aholo_sdk_core import AsyncAholoGatewayClient, assert_cmd_success
 
 from .._paths import lux3d_path
-from ..types import Lux3dStyle, Lux3dVersion
+from ..types import Lux3dOutputFormat, Lux3dStyle, Lux3dVersion
 
 
 class AsyncTextTo3dResource:
@@ -69,9 +69,9 @@ class AsyncTextTo3dResource:
         img: Optional[str] = None,
         version: Optional[Lux3dVersion] = None,
         face_count: Optional[int] = None,
-        need_usdz: Optional[bool] = None,
-        need_obj: Optional[bool] = None,
-        need_fbx: Optional[bool] = None,
+        output_format: Optional[Sequence[Lux3dOutputFormat]] = None,
+        enable_pbr: Optional[bool] = None,
+        texture_size: Optional[int] = None,
     ) -> int:
         body: dict = {"prompt": prompt}
         if style is not None:
@@ -82,9 +82,9 @@ class AsyncTextTo3dResource:
             body,
             version=version,
             face_count=face_count,
-            need_usdz=need_usdz,
-            need_obj=need_obj,
-            need_fbx=need_fbx,
+            output_format=output_format,
+            enable_pbr=enable_pbr,
+            texture_size=texture_size,
         )
         response = await self._gateway.gateway_request(
             method="POST",

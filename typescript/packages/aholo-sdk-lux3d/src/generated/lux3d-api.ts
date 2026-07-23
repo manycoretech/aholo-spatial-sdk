@@ -80,10 +80,11 @@ export interface paths {
          *     建议每 10-15 秒轮询查询任务状态。
          *
          *     版本输出差异：
-         *     - v1.0-pro：首版大模型，具有完整的 PBR 材质属性输出，支持透明材质生成。单格式输出，仅返回 lux3d 格式模型 URL
-         *     - v2.0-preview：2.0 模型架构，重点拓展了对文字、纹理细节的保持能力，不含透明材质。多格式输出，返回 .zip、.glb、.usdz 三种格式
-         *     - v3.0-standard（默认）：3.0 全新模型架构，重点拓展对文字、纹理细节的保持能力，支持五格式输出。返回 .zip、.glb、.usdz、_obj.zip、_fbx.zip 五种格式，依次对应 outputs[0..4]；默认下载 outputs[0]，可通过 ?format=zip / glb / usdz / obj_zip / fbx_zip 切换
-         *     v3.0-standard 中，未通过 needUsdz / needObj / needFbx 请求的可选格式会在对应 outputs 位置返回 NOT_REQUESTED，占位表示该格式未请求，并非任务失败。
+         *     - v1.0-pro：首版大模型，具有完整的 PBR 材质属性输出，支持透明材质生成。单格式输出，返回单个 ZIP 结果
+         *     - v2.0-preview：2.0 模型架构，重点拓展了对文字、纹理细节的保持能力，不含透明材质。支持 .zip、.glb、.usdz、_obj.zip、_fbx.zip
+         *     - v3.0-standard（默认）：新增彩色透明材质支持，减少模型生成色差，提升材质质感，保持文字和纹理细节能力，新增自定义面数，支持五格式输出；返回 .zip、.glb、.usdz、_obj.zip、_fbx.zip，依次对应 outputs[0..4]
+         *     - G1：快速 beta 版本。单独请求 outputFormat=["glb"] 时返回 tex_mesh.glb（enablePbr=true 或未传）或 mesh.glb（enablePbr=false）；单独请求 ["ply"] 时返回 gaussian.ply；未传、空数组、请求 zip 或组合格式时返回 results.zip。PBR 开启时包内包含 mesh/mesh.glb、mesh/tex_mesh.glb、3dgs/gaussian.ply；关闭时不包含 mesh/tex_mesh.glb。默认 faceCount 为 200000，enablePbr 为 true，textureSize 为 1000
+         *     outputFormat 使用列表。v2.0-preview 和 v3.0-standard 支持 zip、glb、usdz、obj_zip、fbx_zip；G1 支持 zip、glb、ply。
          */
         get: operations["getTask"];
         put?: never;
@@ -98,45 +99,52 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description 图生3D任务请求体。 */
+        /** @description 图生3D任务请求体。v1.0-pro、v2.0-preview、v3.0-standard 必须使用 img；G1 可使用 img 单图或 imgs 多视角数组。 */
         ImgTo3dRequest: {
             /**
-             * @description 图片 Base64，建议使用完整 Data URL 格式，例如 data:image/png;base64,...
-             * @example data:image/png;base64,BASE64_IMAGE_STRING
+             * @description 单张图片 URL 或完整 Base64 Data URL，例如 data:image/png;base64,...
+             * @example https://qhstaticssl.kujiale.com/image/jpeg/1784775590613/image_to_3d_model.jpg
              */
-            img: string;
+            img?: string;
             /**
-             * @description Lux3D 版本，支持 v3.0-standard（默认）、v2.0-preview、v1.0-pro。不传则默认使用 v3.0-standard
+             * @description G1 多视角图片列表，支持图片 URL 或完整 Data URL。单图可继续使用 img；G1 多图使用 imgs；img 与 imgs 不能同时传递。
+             * @example [
+             *       "https://qhstaticssl.kujiale.com/image/png/1784775590866/multiview_input_1.png",
+             *       "https://qhstaticssl.kujiale.com/image/png/1784775591151/multiview_input_2.png"
+             *     ]
+             */
+            imgs?: string[];
+            /**
+             * @description Lux3D 版本，支持 v3.0-standard（默认）、v2.0-preview、v1.0-pro、G1。不传则默认使用 v3.0-standard
              * @default v3.0-standard
              * @example v3.0-standard
              * @enum {string}
              */
-            version?: "v3.0-standard" | "v2.0-preview" | "v1.0-pro";
+            version?: "v3.0-standard" | "v2.0-preview" | "v1.0-pro" | "G1";
             /**
-             * @description 可选，目标生成面数。仅 v3.0-standard 生效，v2.0-preview / v1.0-pro 忽略此参数并按各自默认面数生成。取值范围 [10000, 500000]，不传则默认 60000。
-             * @default 60000
+             * @description 可选。指定目标 Mesh 的生成面数，仅影响 Mesh 产物，不影响 3DGS 产物。v2.0-preview、v3.0-standard 和 G1 支持自定义面数，取值范围为 [10000, 500000]。v2.0-preview 和 v3.0-standard 未传此参数时默认使用 60000；G1 未传此参数时默认使用 200000；v1.0-pro 忽略此参数。
              * @example 60000
              */
             faceCount?: number;
             /**
-             * @description 可选，是否导出 USDZ。zip 与 glb 恒定输出，不受此字段控制。不传或传 null 则默认 false（不导出）。
-             * @default false
-             * @example false
+             * @description 统一输出格式列表。v2.0-preview 和 v3.0-standard 支持 zip、glb、usdz、obj_zip、fbx_zip；G1 支持 zip、glb、ply。G1 传 [glb] 或 [ply] 可选择单产物，传 zip、空数组、未传或组合格式返回 results.zip。
+             * @example [
+             *       "zip",
+             *       "glb"
+             *     ]
              */
-            needUsdz?: boolean;
+            outputFormat?: ("zip" | "glb" | "usdz" | "obj_zip" | "fbx_zip" | "ply")[];
             /**
-             * @description 可选，是否导出 OBJ zip 包。不传或传 null 则默认 false（不导出）。
-             * @default false
-             * @example false
+             * @description G1 是否生成带材质/PBR 的 mesh。默认 true；false 时 [glb] 返回白模 mesh.glb。其他版本不使用此字段。
+             * @default true
              */
-            needObj?: boolean;
+            enablePbr?: boolean;
             /**
-             * @description 可选，是否导出 FBX zip 包。不传或传 null 则默认 false（不导出）。
-             * @default false
-             * @example false
+             * @description G1 贴图尺寸，仅在 enablePbr=true 时生效，默认 1000。其他版本不使用此字段。
+             * @default 1000
              */
-            needFbx?: boolean;
-        };
+            textureSize?: number;
+        } & (unknown | unknown);
         /** @description 文生3D任务请求体。 */
         TextTo3dRequest: {
             /**
@@ -157,47 +165,45 @@ export interface components {
              */
             img?: string;
             /**
-             * @description Lux3D 版本，支持 v3.0-standard（默认）、v2.0-preview、v1.0-pro。不传则默认使用 v3.0-standard
+             * @description Lux3D 版本，支持 v3.0-standard（默认）、v2.0-preview、v1.0-pro、G1。不传则默认使用 v3.0-standard
              * @default v3.0-standard
              * @example v3.0-standard
              * @enum {string}
              */
-            version?: "v3.0-standard" | "v2.0-preview" | "v1.0-pro";
+            version?: "v3.0-standard" | "v2.0-preview" | "v1.0-pro" | "G1";
             /**
-             * @description 可选，目标生成面数。仅 v3.0-standard 生效，v2.0-preview / v1.0-pro 忽略此参数并按各自默认面数生成。取值范围 [10000, 500000]，不传则默认 60000。
-             * @default 60000
+             * @description 可选。指定目标 Mesh 的生成面数，仅影响 Mesh 产物，不影响 3DGS 产物。v2.0-preview、v3.0-standard 和 G1 支持自定义面数，取值范围为 [10000, 500000]。v2.0-preview 和 v3.0-standard 未传此参数时默认使用 60000；G1 未传此参数时默认使用 200000；v1.0-pro 忽略此参数。
              * @example 60000
              */
             faceCount?: number;
             /**
-             * @description 可选，是否导出 USDZ。zip 与 glb 恒定输出，不受此字段控制。不传或传 null 则默认 false（不导出）。
-             * @default false
-             * @example false
+             * @description 统一输出格式列表。v2.0-preview 和 v3.0-standard 支持 zip、glb、usdz、obj_zip、fbx_zip；G1 支持 zip、glb、ply。
+             * @example [
+             *       "zip"
+             *     ]
              */
-            needUsdz?: boolean;
+            outputFormat?: ("zip" | "glb" | "usdz" | "obj_zip" | "fbx_zip" | "ply")[];
             /**
-             * @description 可选，是否导出 OBJ zip 包。不传或传 null 则默认 false（不导出）。
-             * @default false
-             * @example false
+             * @description G1 是否生成带材质/PBR 的 mesh，默认 true；false 时 glb 为白模。
+             * @default true
              */
-            needObj?: boolean;
+            enablePbr?: boolean;
             /**
-             * @description 可选，是否导出 FBX zip 包。不传或传 null 则默认 false（不导出）。
-             * @default false
-             * @example false
+             * @description G1 贴图尺寸，仅在 enablePbr=true 时生效，默认 1000。
+             * @default 1000
              */
-            needFbx?: boolean;
+            textureSize?: number;
         };
         /** @description 模型材质重绘任务请求体。 */
         MaterialTransferRequest: {
             /**
              * @description 图片链接或 Base64，用于材质参考图
-             * @example data:image/png;base64,BASE64_IMAGE_STRING
+             * @example https://qhstaticssl.kujiale.com/image/png/1784776951878/material_transfer_input.png
              */
             img: string;
             /**
              * @description 模型 GLB 文件地址
-             * @example https://example.com/model.glb
+             * @example https://qhstaticssl.kujiale.com/application/octetstream/1784776896628/material_transfer_model.glb
              */
             meshUrl: string;
             /**
@@ -208,23 +214,13 @@ export interface components {
              */
             version?: "v3.0-standard" | "v2.0-preview" | "v1.0-pro";
             /**
-             * @description 可选，是否导出 USDZ。zip 与 glb 恒定输出，不受此字段控制。不传或传 null 则默认 false（不导出）。
-             * @default false
-             * @example false
+             * @description 统一输出格式列表。v1.0-pro 仅支持 zip；v2.0-preview/v3.0-standard 支持 zip、glb、usdz、obj_zip、fbx_zip。G1 不支持材质重绘。
+             * @example [
+             *       "zip",
+             *       "glb"
+             *     ]
              */
-            needUsdz?: boolean;
-            /**
-             * @description 可选，是否导出 OBJ zip 包。不传或传 null 则默认 false（不导出）。
-             * @default false
-             * @example false
-             */
-            needObj?: boolean;
-            /**
-             * @description 可选，是否导出 FBX zip 包。不传或传 null 则默认 false（不导出）。
-             * @default false
-             * @example false
-             */
-            needFbx?: boolean;
+            outputFormat?: ("zip" | "glb" | "usdz" | "obj_zip" | "fbx_zip")[];
         };
         /** @description 任务创建响应体。 */
         TaskCreateResponse: {
@@ -242,8 +238,8 @@ export interface components {
         /** @description 任务输出项。 */
         TaskOutput: {
             /**
-             * @description 结果内容。通常为模型文件 URL；v3.0-standard 中未请求的可选导出格式会返回 NOT_REQUESTED。
-             * @example https://cdn.example.com/output/model.lux3d
+             * @description 结果内容。通常为模型文件 URL；未请求的可选槽位可能返回 NOT_REQUESTED。G1 直接返回实际产物 URL。
+             * @example https://cos.example.com/lux3d/xxx/result.zip
              */
             content?: string | null;
         };
@@ -255,7 +251,7 @@ export interface components {
              * @example 1389513
              */
             taskId?: number;
-            /** @description 输出列表。v1.0-pro 版本返回单格式输出（lux3d），v2.0-preview 版本返回多格式输出（.zip、.glb、.usdz），v3.0-standard 版本返回五格式输出（.zip、.glb、.usdz、_obj.zip、_fbx.zip，依次对应 outputs[0..4]，默认下载 outputs[0]）。未请求的可选格式返回 NOT_REQUESTED。 */
+            /** @description 输出列表。v1.0-pro 返回单个 ZIP；v2.0-preview/v3.0-standard 返回五格式槽位（.zip、.glb、.usdz、_obj.zip、_fbx.zip）；G1 按请求返回 results.zip、tex_mesh.glb/mesh.glb 或 gaussian.ply，GLB 是否带材质由 enablePbr 决定。未请求的可选格式返回 NOT_REQUESTED。 */
             outputs?: components["schemas"]["TaskOutput"][];
             /**
              * Format: int32

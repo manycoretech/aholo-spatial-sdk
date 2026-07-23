@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.manycoreapis</groupId>
             <artifactId>aholo-sdk-lux3d</artifactId>
-            <version>1.3.0</version>
+            <version>1.4.0</version>
         </dependency>
         <dependency>
             <groupId>com.manycoreapis</groupId>

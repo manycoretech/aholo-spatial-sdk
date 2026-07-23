@@ -3,12 +3,12 @@ from __future__ import annotations
 import base64
 import mimetypes
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from manycore.aholo_sdk_core import assert_cmd_success
 
 from .._paths import lux3d_path
-from ..types import Lux3dVersion
+from ..types import Lux3dOutputFormat, Lux3dVersion
 
 if TYPE_CHECKING:
     from manycore.aholo_sdk_core import AholoGatewayClient
@@ -26,20 +26,34 @@ def _append_create_opts(
     *,
     version: Optional[Lux3dVersion] = None,
     face_count: Optional[int] = None,
-    need_usdz: Optional[bool] = None,
-    need_obj: Optional[bool] = None,
-    need_fbx: Optional[bool] = None,
+    output_format: Optional[Sequence[Lux3dOutputFormat]] = None,
+    enable_pbr: Optional[bool] = None,
+    texture_size: Optional[int] = None,
 ) -> None:
     if version is not None:
         body["version"] = version
     if face_count is not None:
         body["faceCount"] = face_count
-    if need_usdz is not None:
-        body["needUsdz"] = need_usdz
-    if need_obj is not None:
-        body["needObj"] = need_obj
-    if need_fbx is not None:
-        body["needFbx"] = need_fbx
+    if output_format is not None:
+        body["outputFormat"] = list(output_format)
+    if enable_pbr is not None:
+        body["enablePbr"] = enable_pbr
+    if texture_size is not None:
+        body["textureSize"] = texture_size
+
+
+def _img_body(
+    *,
+    img: Optional[str] = None,
+    imgs: Optional[Sequence[str]] = None,
+) -> dict:
+    has_img = img is not None
+    has_imgs = imgs is not None
+    if has_img == has_imgs:
+        raise ValueError("Provide exactly one of img or imgs")
+    if has_imgs and len(imgs) == 0:
+        raise ValueError("imgs must not be empty")
+    return {"img": img} if has_img else {"imgs": list(imgs)}
 
 
 class ImgTo3dResource:
@@ -50,22 +64,23 @@ class ImgTo3dResource:
     def create(
         self,
         *,
-        img: str,
+        img: Optional[str] = None,
+        imgs: Optional[Sequence[str]] = None,
         version: Optional[Lux3dVersion] = None,
         face_count: Optional[int] = None,
-        need_usdz: Optional[bool] = None,
-        need_obj: Optional[bool] = None,
-        need_fbx: Optional[bool] = None,
+        output_format: Optional[Sequence[Lux3dOutputFormat]] = None,
+        enable_pbr: Optional[bool] = None,
+        texture_size: Optional[int] = None,
     ) -> int:
         """POST /generate/img-to-3d/task/create"""
-        body: dict = {"img": img}
+        body = _img_body(img=img, imgs=imgs)
         _append_create_opts(
             body,
             version=version,
             face_count=face_count,
-            need_usdz=need_usdz,
-            need_obj=need_obj,
-            need_fbx=need_fbx,
+            output_format=output_format,
+            enable_pbr=enable_pbr,
+            texture_size=texture_size,
         )
         response = self._gateway.gateway_request(
             method="POST",
@@ -80,18 +95,38 @@ class ImgTo3dResource:
         *,
         version: Optional[Lux3dVersion] = None,
         face_count: Optional[int] = None,
-        need_usdz: Optional[bool] = None,
-        need_obj: Optional[bool] = None,
-        need_fbx: Optional[bool] = None,
+        output_format: Optional[Sequence[Lux3dOutputFormat]] = None,
+        enable_pbr: Optional[bool] = None,
+        texture_size: Optional[int] = None,
     ) -> int:
         """Create img-to-3D task from a local image file (encodes to Data URL automatically)."""
         return self.create(
             img=_file_to_data_url(file_path),
             version=version,
             face_count=face_count,
-            need_usdz=need_usdz,
-            need_obj=need_obj,
-            need_fbx=need_fbx,
+            output_format=output_format,
+            enable_pbr=enable_pbr,
+            texture_size=texture_size,
+        )
+
+    def create_from_files(
+        self,
+        file_paths: Sequence[str | Path],
+        *,
+        version: Optional[Lux3dVersion] = None,
+        face_count: Optional[int] = None,
+        output_format: Optional[Sequence[Lux3dOutputFormat]] = None,
+        enable_pbr: Optional[bool] = None,
+        texture_size: Optional[int] = None,
+    ) -> int:
+        """Create a G1 multi-view img-to-3D task from local image files (sent as ``imgs``)."""
+        return self.create(
+            imgs=[_file_to_data_url(p) for p in file_paths],
+            version=version,
+            face_count=face_count,
+            output_format=output_format,
+            enable_pbr=enable_pbr,
+            texture_size=texture_size,
         )
 
 import asyncio
@@ -99,7 +134,7 @@ import asyncio
 from manycore.aholo_sdk_core import AsyncAholoGatewayClient, assert_cmd_success
 
 from .._paths import lux3d_path
-from ..types import Lux3dVersion
+from ..types import Lux3dOutputFormat, Lux3dVersion
 
 
 class AsyncImgTo3dResource:
@@ -110,21 +145,22 @@ class AsyncImgTo3dResource:
     async def create(
         self,
         *,
-        img: str,
+        img: Optional[str] = None,
+        imgs: Optional[Sequence[str]] = None,
         version: Optional[Lux3dVersion] = None,
         face_count: Optional[int] = None,
-        need_usdz: Optional[bool] = None,
-        need_obj: Optional[bool] = None,
-        need_fbx: Optional[bool] = None,
+        output_format: Optional[Sequence[Lux3dOutputFormat]] = None,
+        enable_pbr: Optional[bool] = None,
+        texture_size: Optional[int] = None,
     ) -> int:
-        body: dict = {"img": img}
+        body = _img_body(img=img, imgs=imgs)
         _append_create_opts(
             body,
             version=version,
             face_count=face_count,
-            need_usdz=need_usdz,
-            need_obj=need_obj,
-            need_fbx=need_fbx,
+            output_format=output_format,
+            enable_pbr=enable_pbr,
+            texture_size=texture_size,
         )
         response = await self._gateway.gateway_request(
             method="POST",
@@ -139,16 +175,38 @@ class AsyncImgTo3dResource:
         *,
         version: Optional[Lux3dVersion] = None,
         face_count: Optional[int] = None,
-        need_usdz: Optional[bool] = None,
-        need_obj: Optional[bool] = None,
-        need_fbx: Optional[bool] = None,
+        output_format: Optional[Sequence[Lux3dOutputFormat]] = None,
+        enable_pbr: Optional[bool] = None,
+        texture_size: Optional[int] = None,
     ) -> int:
         img = await asyncio.to_thread(_file_to_data_url, file_path)
         return await self.create(
             img=img,
             version=version,
             face_count=face_count,
-            need_usdz=need_usdz,
-            need_obj=need_obj,
-            need_fbx=need_fbx,
+            output_format=output_format,
+            enable_pbr=enable_pbr,
+            texture_size=texture_size,
+        )
+
+    async def create_from_files(
+        self,
+        file_paths: Sequence[str | Path],
+        *,
+        version: Optional[Lux3dVersion] = None,
+        face_count: Optional[int] = None,
+        output_format: Optional[Sequence[Lux3dOutputFormat]] = None,
+        enable_pbr: Optional[bool] = None,
+        texture_size: Optional[int] = None,
+    ) -> int:
+        imgs = await asyncio.gather(
+            *[asyncio.to_thread(_file_to_data_url, p) for p in file_paths]
+        )
+        return await self.create(
+            imgs=list(imgs),
+            version=version,
+            face_count=face_count,
+            output_format=output_format,
+            enable_pbr=enable_pbr,
+            texture_size=texture_size,
         )

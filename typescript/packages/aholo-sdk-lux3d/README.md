@@ -35,15 +35,23 @@ const taskId = await lux3d.imgTo3d.createFromFile('./object.jpg');
 const result = await lux3d.tasks.waitFor(taskId);
 ```
 
-### v3.0-standard options (face count & optional exports)
+### Output formats & face count
 
 ```typescript
 const taskId = await lux3d.imgTo3d.create({
   img: 'https://example.com/object.jpg',
   faceCount: 80_000,
-  needUsdz: true,
-  needObj: true,
+  outputFormat: ['zip', 'glb', 'usdz', 'obj_zip'],
 });
+```
+
+### G1 multi-view (local files)
+
+```typescript
+const taskId = await lux3d.imgTo3d.createFromFiles(
+  ['./view1.png', './view2.png', './view3.png'],
+  { version: 'G1', outputFormat: ['glb'], enablePbr: true },
+);
 ```
 
 ### Text to 3D
@@ -61,19 +69,21 @@ const result = await lux3d.tasks.waitFor(taskId);
 const taskId = await lux3d.materialTransfer.create({
   img: 'https://example.com/material.jpg',
   meshUrl: 'https://example.com/model.glb',
+  outputFormat: ['zip', 'glb'],
 });
 const result = await lux3d.tasks.waitFor(taskId);
 ```
 
 ### Version differences
 
-| Version | Default | Output formats (`outputs` indices) |
-|---------|---------|----------------------------------|
-| `v3.0-standard` | ✓ | `[0]` zip, `[1]` glb, `[2]` usdz, `[3]` obj zip, `[4]` fbx zip |
-| `v2.0-preview` | | `[0]` zip, `[1]` glb, `[2]` usdz |
-| `v1.0-pro` | | `[0]` lux3d only |
+| Version | Default | Outputs |
+|---------|---------|---------|
+| `v3.0-standard` | ✓ | Five slots: zip / glb / usdz / obj_zip / fbx_zip; unrequested → `NOT_REQUESTED` |
+| `v2.0-preview` | | Same five-slot layout as v3 |
+| `v1.0-pro` | | Single ZIP |
+| `G1` (beta) | | `results.zip` / `tex_mesh.glb`\|`mesh.glb` / `gaussian.ply` via `outputFormat`; `enablePbr` / `textureSize` |
 
-For `v3.0-standard`, optional slots (`usdz` / `obj` / `fbx`) return `NOT_REQUESTED` when not requested via `needUsdz` / `needObj` / `needFbx`. `faceCount` (10_000–500_000) applies to v3.0-standard only.
+Use `outputFormat` (string array) instead of the removed `needUsdz` / `needObj` / `needFbx`. `faceCount` (10_000–500_000) applies to v2 / v3 / G1; v1 ignores it.
 
 ## Full Documentation
 

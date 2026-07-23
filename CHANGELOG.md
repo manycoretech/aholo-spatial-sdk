@@ -5,6 +5,27 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Lux3D 1.4.0] - 2026-07-20
+
+### Added
+
+- **Lux3D API**: Version `G1` (beta) for image/text-to-3D; multi-view input via `imgs` (1–32).
+- **Lux3D API**: G1 options `enablePbr` / `textureSize`; G1 outputs `zip` / `glb` / `ply`.
+- **TypeScript / Python / Java**: `createFromFiles` / `create_from_files` helpers for local multi-view uploads.
+- **TypeScript / Python**: `Lux3dOutputFormat` type alias.
+
+### Changed
+
+- Synced Lux3D OpenAPI spec across TypeScript, Python, and Java.
+- Bumped **lux3d** packages only (`@manycore/aholo-sdk-lux3d`, `manycore-aholo-sdk-lux3d`, `com.manycoreapis:aholo-sdk-lux3d`) to **1.4.0**.
+- v2.0-preview task outputs align with v3 five-format slots; v1.0-pro returns a single ZIP (not `.lux3d`).
+- `faceCount` applies to v2.0-preview, v3.0-standard, and G1.
+
+### Breaking Changes
+
+- Removed create-task params `needUsdz` / `needObj` / `needFbx` (and Python `need_usdz` / `need_obj` / `need_fbx`).
+- Use `outputFormat` (TypeScript/Java) / `output_format` (Python) string array instead.
+
 ## [Lux3D 1.3.0] - 2026-07-08
 
 ### Added
@@ -72,6 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Repository initialized.
 
+[lux3d-1.4.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.3.0...lux3d/v1.4.0
 [lux3d-1.3.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.2.0...lux3d/v1.3.0
 [1.3.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/world/v1.2.0...world/v1.3.0
 [1.2.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/world/v1.1.0...dae395e

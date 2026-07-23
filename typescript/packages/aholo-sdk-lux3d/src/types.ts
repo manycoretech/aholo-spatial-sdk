@@ -14,10 +14,11 @@ export type TaskQueryData      = components['schemas']['TaskQueryData'];
 export type TaskQueryResponse  = components['schemas']['TaskQueryResponse'];
 
 // --- Enum aliases (extracted from spec union literals) ---
-export type Lux3dVersion    = NonNullable<ImgTo3dRequest['version']>;
-export type Lux3dStyle      = NonNullable<TextTo3dRequest['style']>;
+export type Lux3dVersion      = NonNullable<ImgTo3dRequest['version']>;
+export type Lux3dStyle        = NonNullable<TextTo3dRequest['style']>;
+export type Lux3dOutputFormat = NonNullable<ImgTo3dRequest['outputFormat']>[number];
 /** 0 init, 1 running, 3 success, 4 failed */
-export type Lux3dTaskStatus = NonNullable<TaskQueryData['status']>;
+export type Lux3dTaskStatus   = NonNullable<TaskQueryData['status']>;
 
 export const LUX3D_STATUS_SUCCESS = 3 as const;
 export const LUX3D_STATUS_FAILED  = 4 as const;

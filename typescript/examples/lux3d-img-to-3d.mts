@@ -1,9 +1,9 @@
 /**
  * Minimal example: image-to-3D with Lux3D, poll until the model URLs are ready.
  *
- * v3.0-standard (default): zip + glb + optional usdz/obj/fbx (outputs[0..4])
- * v2.0-preview:              zip + glb + usdz
- * v1.0-pro:                  single .lux3d format
+ * v3.0-standard / v2.0-preview: zip + glb + optional usdz/obj/fbx via outputFormat
+ * v1.0-pro:                     single ZIP
+ * G1:                           zip / glb / ply via outputFormat
  *
  * Usage:
  *   AHOLO_API_KEY=xxx npx tsx examples/lux3d-img-to-3d.mts ./chair.png
@@ -26,7 +26,7 @@ console.log(`taskId=${taskId}, polling...`);
 const t0 = Date.now();
 const result = await lux3d.tasks.waitFor(taskId);
 console.log(`Task complete (${Date.now() - t0}ms)`);
-// v3.0-standard outputs: [zip, glb, usdz?, obj?, fbx?] — optional slots may be NOT_REQUESTED
+// Optional slots may be NOT_REQUESTED when not listed in outputFormat
 for (const output of result.outputs) {
   console.log(output.content);
 }

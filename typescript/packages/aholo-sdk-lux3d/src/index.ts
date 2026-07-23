@@ -9,6 +9,7 @@ export {
   LUX3D_STATUS_FAILED,
   LUX3D_STATUS_SUCCESS,
   type ImgTo3dRequest,
+  type Lux3dOutputFormat,
   type Lux3dRequestOptions,
   type Lux3dStyle,
   type Lux3dTaskResult,

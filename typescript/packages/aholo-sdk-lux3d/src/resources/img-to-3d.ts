@@ -33,10 +33,23 @@ export class ImgTo3dResource {
   /** Create img-to-3D task from a local image file (encodes to Data URL automatically). */
   async createFromFile(
     filePath: string,
-    request: Omit<ImgTo3dRequest, 'img'> = {},
+    request: Omit<ImgTo3dRequest, 'img' | 'imgs'> = {},
     options?: Lux3dRequestOptions,
   ): Promise<number> {
     const img = await fileToDataUrl(filePath);
     return this.create({ ...request, img }, options);
+  }
+
+  /**
+   * Create a G1 multi-view img-to-3D task from local image files
+   * (encodes each file to a Data URL and sends as `imgs`).
+   */
+  async createFromFiles(
+    filePaths: string[],
+    request: Omit<ImgTo3dRequest, 'img' | 'imgs'> = {},
+    options?: Lux3dRequestOptions,
+  ): Promise<number> {
+    const imgs = await Promise.all(filePaths.map((path) => fileToDataUrl(path)));
+    return this.create({ ...request, imgs }, options);
   }
 }
