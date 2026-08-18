@@ -4,6 +4,7 @@ import com.manycoreapis.sdk.core.AholoClientConfig;
 import com.manycoreapis.sdk.core.AholoGatewayClient;
 import com.manycoreapis.sdk.lux3d.resources.ImgTo3dResource;
 import com.manycoreapis.sdk.lux3d.resources.MaterialTransferResource;
+import com.manycoreapis.sdk.lux3d.resources.PartSplitResource;
 import com.manycoreapis.sdk.lux3d.resources.TasksResource;
 import com.manycoreapis.sdk.lux3d.resources.TextTo3dResource;
 
@@ -16,6 +17,7 @@ import com.manycoreapis.sdk.lux3d.resources.TextTo3dResource;
  * long taskId = lux3d.imgTo3d().createFromFile(Paths.get("chair.png"));
  * taskId = lux3d.textTo3d().create(TextTo3dCreateParams.builder().prompt("A wooden chair").build());
  * lux3d.materialTransfer().create(MaterialTransferCreateParams.builder()...build());
+ * lux3d.partSplit().create(PartSplitCreateParams.builder().glbUrl("https://example.com/model.glb").build());
  * TaskResult result = lux3d.tasks().waitFor(taskId);
  * }</pre>
  */
@@ -23,6 +25,7 @@ public class Lux3dClient {
     private final ImgTo3dResource imgTo3d;
     private final TextTo3dResource textTo3d;
     private final MaterialTransferResource materialTransfer;
+    private final PartSplitResource partSplit;
     private final TasksResource tasks;
 
     public Lux3dClient(AholoClientConfig config) {
@@ -32,6 +35,7 @@ public class Lux3dClient {
         this.imgTo3d = new ImgTo3dResource(gateway, prefix);
         this.textTo3d = new TextTo3dResource(gateway, prefix);
         this.materialTransfer = new MaterialTransferResource(gateway, prefix);
+        this.partSplit = new PartSplitResource(gateway, prefix);
         this.tasks = new TasksResource(gateway, prefix);
     }
 
@@ -47,6 +51,9 @@ public class Lux3dClient {
 
     /** Material transfer. */
     public MaterialTransferResource materialTransfer() { return materialTransfer; }
+
+    /** GLB part split. */
+    public PartSplitResource partSplit() { return partSplit; }
 
     /** Task retrieval and polling. */
     public TasksResource tasks() { return tasks; }

@@ -1,6 +1,6 @@
 # Aholo Spatial SDK
 
-[Aholo](https://labs.aholo3d.cn) OpenAPI 官方 SDK，提供资产上传、Lux3D 图像/文字转 3D 生成、3DGS 世界重建等能力，支持 TypeScript/Node.js、Python、Java 三种语言。
+[Aholo](https://labs.aholo3d.cn) OpenAPI 官方 SDK，提供资产上传、Lux3D 生成/部件拆分/生成记录查询、3DGS 世界重建等能力，支持 TypeScript/Node.js、Python、Java 三种语言。
 
 > 📖 **完整文档（canonical）**：[https://labs.aholo3d.cn/api-docs/sdk](https://labs.aholo3d.cn/api-docs/sdk)
 

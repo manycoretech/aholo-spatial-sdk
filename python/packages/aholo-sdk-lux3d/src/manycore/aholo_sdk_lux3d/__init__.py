@@ -2,6 +2,7 @@ from .async_lux3d_client import AsyncLux3dClient, create_async_lux3d_client
 from .lux3d_client import Lux3dClient, create_lux3d_client, file_to_data_url
 from .resources.img_to_3d import AsyncImgTo3dResource, ImgTo3dResource
 from .resources.material_transfer import AsyncMaterialTransferResource, MaterialTransferResource
+from .resources.part_split import AsyncPartSplitResource, PartSplitResource
 from .resources.tasks import AsyncTasksResource, TasksResource
 from .resources.text_to_3d import AsyncTextTo3dResource, TextTo3dResource
 from .types import (
@@ -13,6 +14,8 @@ from .types import (
     Lux3dTaskResult,
     Lux3dTaskStatus,
     Lux3dVersion,
+    TaskListItem,
+    TaskPagedList,
     TaskOutput,
 )
 
@@ -21,6 +24,7 @@ __all__ = [
     "create_async_lux3d_client",
     "AsyncImgTo3dResource",
     "AsyncMaterialTransferResource",
+    "AsyncPartSplitResource",
     "AsyncTasksResource",
     "AsyncTextTo3dResource",
     "Lux3dClient",
@@ -28,6 +32,7 @@ __all__ = [
     "file_to_data_url",
     "ImgTo3dResource",
     "MaterialTransferResource",
+    "PartSplitResource",
     "TasksResource",
     "TextTo3dResource",
     "LUX3D_OUTPUT_NOT_REQUESTED",
@@ -38,5 +43,7 @@ __all__ = [
     "Lux3dTaskResult",
     "Lux3dTaskStatus",
     "Lux3dVersion",
+    "TaskListItem",
+    "TaskPagedList",
     "TaskOutput",
 ]

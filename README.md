@@ -2,7 +2,7 @@
 
 [中文文档](README.zh-CN.md)
 
-Official SDKs for the [Aholo](https://labs.aholo3d.com) Open API — asset upload, Lux3D image/text-to-3D generation, and 3DGS world reconstruction.
+Official SDKs for the [Aholo](https://labs.aholo3d.com) Open API — asset upload, Lux3D generation/part split/task history, and 3DGS world reconstruction.
 
 > 📖 **Full documentation (canonical)**: [https://labs.aholo3d.com/api-docs/en/sdk](https://labs.aholo3d.com/api-docs/en/sdk)
 

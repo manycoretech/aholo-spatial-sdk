@@ -67,6 +67,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/lux3d/v1/part-split/task/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 创建部件拆分任务
+         * @description 创建部件拆分任务，输入 GLB 模型 URL，将模型拆分为多个独立部件。请求成功后返回任务 ID taskid，后续可通过查询接口获取任务状态和结果。
+         *
+         *     注意：部件拆分能力有全局并发限制，当前为单并发。若服务繁忙，请稍后再试。
+         */
+        post: operations["createPartSplitTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/lux3d/v1/generate/task/get": {
         parameters: {
             query?: never;
@@ -76,17 +98,43 @@ export interface paths {
         };
         /**
          * 查询生成任务
-         * @description 根据 taskid 查询图生3D、文生3D或模型材质重绘任务状态和结果。查询结果中的输出内容有效期为 2 小时，建议在任务成功后尽快获取并保存结果。
+         * @description 根据 taskid 查询图生3D、文生3D、模型材质重绘或部件拆分任务状态和结果。查询结果中的输出内容有效期为 2 小时，建议在任务成功后尽快获取并保存结果。
          *     建议每 10-15 秒轮询查询任务状态。
          *
-         *     版本输出差异：
+         *     图生3D / 文生3D / 材质重绘 版本输出差异：
          *     - v1.0-pro：首版大模型，具有完整的 PBR 材质属性输出，支持透明材质生成。单格式输出，返回单个 ZIP 结果
          *     - v2.0-preview：2.0 模型架构，重点拓展了对文字、纹理细节的保持能力，不含透明材质。支持 .zip、.glb、.usdz、_obj.zip、_fbx.zip
          *     - v3.0-standard（默认）：新增彩色透明材质支持，减少模型生成色差，提升材质质感，保持文字和纹理细节能力，新增自定义面数，支持五格式输出；返回 .zip、.glb、.usdz、_obj.zip、_fbx.zip，依次对应 outputs[0..4]
-         *     - G1：快速 beta 版本。单独请求 outputFormat=["glb"] 时返回 tex_mesh.glb（enablePbr=true 或未传）或 mesh.glb（enablePbr=false）；单独请求 ["ply"] 时返回 gaussian.ply；未传、空数组、请求 zip 或组合格式时返回 results.zip。PBR 开启时包内包含 mesh/mesh.glb、mesh/tex_mesh.glb、3dgs/gaussian.ply；关闭时不包含 mesh/tex_mesh.glb。默认 faceCount 为 200000，enablePbr 为 true，textureSize 为 1000
+         *     - G1：快速 beta 版本。单独请求 outputFormat=["glb"] 时返回 tex_mesh.glb（enablePbr=true 或未传）或 mesh.glb（enablePbr=false）；单独请求 ["ply"] 时返回 gaussian.ply；未传、空数组或仅请求 zip 时返回 results.zip；组合格式按 outputFormat 顺序返回对应的多个产物 URL。PBR 开启时包内包含 mesh/mesh.glb、mesh/tex_mesh.glb、3dgs/gaussian.ply；关闭时不包含 mesh/tex_mesh.glb。默认 faceCount 为 200000，enablePbr 为 true，textureSize 为 2048
          *     outputFormat 使用列表。v2.0-preview 和 v3.0-standard 支持 zip、glb、usdz、obj_zip、fbx_zip；G1 支持 zip、glb、ply。
+         *
+         *     部件拆分任务输出：
+         *     - 输出单个 GLB 文件，内含拆分后的多个独立部件（不以多个文件返回）。
          */
         get: operations["getTask"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/lux3d/v1/generate/task/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 分页查询生成记录
+         * @description 分页查询当前 API Key 所属账号下的 Lux3D 生成记录，可按任务状态和创建时间段筛选。
+         *     时间条件作用于任务创建时间，查询区间为 [starttime, endtime)。
+         *     列表仅返回任务 ID、状态和时间信息，不暴露版本、产物及内部模型信息。
+         *     所有可选 Query 参数均不传时，默认按 page=1、pagesize=20 查询全部状态和全部创建时间；请省略可选参数，不要传空字符串。
+         */
+        get: operations["listTasks"];
         put?: never;
         post?: never;
         delete?: never;
@@ -127,7 +175,7 @@ export interface components {
              */
             faceCount?: number;
             /**
-             * @description 统一输出格式列表。v2.0-preview 和 v3.0-standard 支持 zip、glb、usdz、obj_zip、fbx_zip；G1 支持 zip、glb、ply。G1 传 [glb] 或 [ply] 可选择单产物，传 zip、空数组、未传或组合格式返回 results.zip。
+             * @description 统一输出格式列表。v2.0-preview 和 v3.0-standard 支持 zip、glb、usdz、obj_zip、fbx_zip；G1 支持 zip、glb、ply。G1 传空数组或未传时返回 results.zip；单格式返回对应产物；组合格式按数组顺序返回多个产物 URL，只有显式包含 zip 时才返回 results.zip。
              * @example [
              *       "zip",
              *       "glb"
@@ -135,13 +183,13 @@ export interface components {
              */
             outputFormat?: ("zip" | "glb" | "usdz" | "obj_zip" | "fbx_zip" | "ply")[];
             /**
-             * @description G1 是否生成带材质/PBR 的 mesh。默认 true；false 时 [glb] 返回白模 mesh.glb。其他版本不使用此字段。
+             * @description 仅 G1 版本生成 Mesh 时生效。未传或 true 生成 G1 自带 PBR 材质；false 生成白模 mesh.glb。其他版本不使用此字段。
              * @default true
              */
             enablePbr?: boolean;
             /**
-             * @description G1 贴图尺寸，仅在 enablePbr=true 时生效，默认 1000。其他版本不使用此字段。
-             * @default 1000
+             * @description 仅 G1 版本生成 Mesh 且 enablePbr 未传或为 true 时生效，用于设置 G1 PBR 贴图尺寸，默认 2048。其他版本不使用此字段。
+             * @default 2048
              */
             textureSize?: number;
         } & (unknown | unknown);
@@ -184,13 +232,13 @@ export interface components {
              */
             outputFormat?: ("zip" | "glb" | "usdz" | "obj_zip" | "fbx_zip" | "ply")[];
             /**
-             * @description G1 是否生成带材质/PBR 的 mesh，默认 true；false 时 glb 为白模。
+             * @description 仅 G1 版本生成 Mesh 时生效。未传或 true 生成 G1 自带 PBR 材质；false 生成白模。
              * @default true
              */
             enablePbr?: boolean;
             /**
-             * @description G1 贴图尺寸，仅在 enablePbr=true 时生效，默认 1000。
-             * @default 1000
+             * @description 仅 G1 版本生成 Mesh 且 enablePbr 未传或为 true 时生效，用于设置 G1 PBR 贴图尺寸，默认 2048。
+             * @default 2048
              */
             textureSize?: number;
         };
@@ -222,6 +270,14 @@ export interface components {
              */
             outputFormat?: ("zip" | "glb" | "usdz" | "obj_zip" | "fbx_zip")[];
         };
+        /** @description 部件拆分任务请求体。 */
+        PartSplitRequest: {
+            /**
+             * @description 待拆分的 GLB 模型公网 URL，通常来自 Lux3D 生成任务的 GLB 产物
+             * @example https://qhstaticssl.kujiale.com/application/octetstream/1784776896628/model.glb
+             */
+            glbUrl: string;
+        };
         /** @description 任务创建响应体。 */
         TaskCreateResponse: {
             /**
@@ -251,7 +307,7 @@ export interface components {
              * @example 1389513
              */
             taskId?: number;
-            /** @description 输出列表。v1.0-pro 返回单个 ZIP；v2.0-preview/v3.0-standard 返回五格式槽位（.zip、.glb、.usdz、_obj.zip、_fbx.zip）；G1 按请求返回 results.zip、tex_mesh.glb/mesh.glb 或 gaussian.ply，GLB 是否带材质由 enablePbr 决定。未请求的可选格式返回 NOT_REQUESTED。 */
+            /** @description 输出列表。图生3D/文生3D/材质重绘：v1.0-pro 返回单个 ZIP；v2.0-preview/v3.0-standard 返回五格式槽位（.zip、.glb、.usdz、_obj.zip、_fbx.zip）；G1 单格式返回对应产物，组合格式按 outputFormat 顺序返回多个产物 URL，GLB 是否带材质由 enablePbr 决定。未请求的经典版本可选格式返回 NOT_REQUESTED。部件拆分：输出单个 GLB 文件，内含拆分后的多个独立部件（不以多个文件返回）。 */
             outputs?: components["schemas"]["TaskOutput"][];
             /**
              * Format: int32
@@ -267,6 +323,48 @@ export interface components {
             /** @description 提示信息 */
             m?: string | null;
             /** @description 状态码 */
+            c?: string | null;
+        };
+        TaskListItem: {
+            /**
+             * Format: int64
+             * @description 任务 ID
+             */
+            taskId?: number;
+            /**
+             * @description 任务状态：0-初始化，1-运行中，3-成功，4-失败。
+             * @enum {integer}
+             */
+            status?: 0 | 1 | 3 | 4;
+            /**
+             * Format: int64
+             * @description 任务创建时间，Unix 毫秒时间戳
+             */
+            created?: number;
+            /**
+             * Format: int64
+             * @description 任务最后修改时间，Unix 毫秒时间戳
+             */
+            lastModified?: number;
+        };
+        TaskListData: {
+            items?: components["schemas"]["TaskListItem"][];
+            /** @description 符合条件的任务总数 */
+            total?: number;
+            /** @description 当前页码 */
+            page?: number;
+            /** @description 每页数量 */
+            pageSize?: number;
+        };
+        /**
+         * @description 生成记录分页响应体。
+         *     注意：列表接口成功时 c 固定为 "0"、m 固定为 ""（空字符串），与创建/查询任务接口成功时 c/m 均为 null 的行为不同，请按 c === "0" 判断成功。
+         */
+        TaskListResponse: {
+            d?: components["schemas"]["TaskListData"];
+            /** @description 提示信息。成功时为空字符串 ""。 */
+            m?: string | null;
+            /** @description 状态码。成功时为 "0"，失败时为错误码字符串。 */
             c?: string | null;
         };
     };
@@ -407,6 +505,49 @@ export interface operations {
             };
         };
     };
+    createPartSplitTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description 部件拆分任务请求体。 */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PartSplitRequest"];
+            };
+        };
+        responses: {
+            /** @description 成功时返回任务ID。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskCreateResponse"];
+                };
+            };
+            /** @description 未携带或无效的 Authorization，鉴权失败 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskCreateResponse"];
+                };
+            };
+            /** @description 服务端内部错误 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskCreateResponse"];
+                };
+            };
+        };
+    };
     getTask: {
         parameters: {
             query: {
@@ -447,6 +588,55 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TaskQueryResponse"];
+                };
+            };
+        };
+    };
+    listTasks: {
+        parameters: {
+            query?: {
+                /** @description 页码，从 1 开始 */
+                page?: number;
+                /** @description 每页数量，范围 1-100 */
+                pagesize?: number;
+                /** @description 任务状态：0-初始化，1-运行中，3-成功，4-失败。 */
+                status?: 0 | 1 | 3 | 4;
+                /** @description 创建时间起点，包含边界；Unix 毫秒时间戳 */
+                starttime?: number;
+                /** @description 创建时间终点，不包含边界；Unix 毫秒时间戳 */
+                endtime?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 成功返回当前账号的生成记录分页数据。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskListResponse"];
+                };
+            };
+            /** @description 未携带或无效的 Authorization，鉴权失败 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskListResponse"];
+                };
+            };
+            /** @description 服务端内部错误 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskListResponse"];
                 };
             };
         };

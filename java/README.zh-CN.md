@@ -13,7 +13,7 @@
 | Artifact | 版本 | 说明 |
 |----------|------|------|
 | `com.manycoreapis:aholo-sdk-asset` | [![Maven Central](https://img.shields.io/maven-central/v/com.manycoreapis/aholo-sdk-asset?color=C71A36&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/com.manycoreapis/aholo-sdk-asset) | 文件上传（单文件/分块上传，支持断点续传） |
-| `com.manycoreapis:aholo-sdk-lux3d` | [![Maven Central](https://img.shields.io/maven-central/v/com.manycoreapis/aholo-sdk-lux3d?color=C71A36&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/com.manycoreapis/aholo-sdk-lux3d) | Lux3D 图像/文字转 3D 生成、材质迁移 |
+| `com.manycoreapis:aholo-sdk-lux3d` | [![Maven Central](https://img.shields.io/maven-central/v/com.manycoreapis/aholo-sdk-lux3d?color=C71A36&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/com.manycoreapis/aholo-sdk-lux3d) | Lux3D 生成、材质迁移、部件拆分、生成记录查询 |
 | `com.manycoreapis:aholo-sdk-world` | [![Maven Central](https://img.shields.io/maven-central/v/com.manycoreapis/aholo-sdk-world?color=C71A36&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/com.manycoreapis/aholo-sdk-world) | 3DGS 世界重建与生成 |
 | `com.manycoreapis:aholo-sdk-core` | [![Maven Central](https://img.shields.io/maven-central/v/com.manycoreapis/aholo-sdk-core?color=C71A36&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/com.manycoreapis/aholo-sdk-core) | 公共 HTTP 客户端、鉴权、错误类型、轮询 |
 

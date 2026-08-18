@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, cast
 
 from manycore.aholo_sdk_core import BusinessError, assert_cmd_success, poll_until
 
 from .._paths import lux3d_path
-from ..types import LUX3D_STATUS_FAILED, LUX3D_STATUS_SUCCESS, Lux3dTaskResult
+from ..types import LUX3D_STATUS_FAILED, LUX3D_STATUS_SUCCESS, Lux3dTaskResult, TaskPagedList
 
 if TYPE_CHECKING:
     from manycore.aholo_sdk_core import AholoGatewayClient
@@ -52,10 +52,38 @@ class TasksResource:
             timeout_ms=timeout_ms,
         )
 
+    def list(
+        self,
+        *,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+        status: Optional[int] = None,
+        start_time: Optional[int] = None,
+        end_time: Optional[int] = None,
+    ) -> TaskPagedList:
+        """GET /generate/task/list. Omitted filters are not sent."""
+        query: dict = {}
+        if page is not None:
+            query["page"] = page
+        if page_size is not None:
+            query["pagesize"] = page_size
+        if status is not None:
+            query["status"] = status
+        if start_time is not None:
+            query["starttime"] = start_time
+        if end_time is not None:
+            query["endtime"] = end_time
+        body = self._gateway.gateway_request(
+            method="GET",
+            path=lux3d_path(self._region, "/generate/task/list"),
+            query=query,
+        )
+        return cast(TaskPagedList, assert_cmd_success(body, "tasks.list"))
+
 from manycore.aholo_sdk_core import AsyncAholoGatewayClient, BusinessError, assert_cmd_success, poll_until_async
 
 from .._paths import lux3d_path
-from ..types import LUX3D_STATUS_FAILED, LUX3D_STATUS_SUCCESS, Lux3dTaskResult
+from ..types import LUX3D_STATUS_FAILED, LUX3D_STATUS_SUCCESS, Lux3dTaskResult, TaskPagedList
 
 
 class AsyncTasksResource:
@@ -93,3 +121,30 @@ class AsyncTasksResource:
             interval_ms=interval_ms,
             timeout_ms=timeout_ms,
         )
+
+    async def list(
+        self,
+        *,
+        page: Optional[int] = None,
+        page_size: Optional[int] = None,
+        status: Optional[int] = None,
+        start_time: Optional[int] = None,
+        end_time: Optional[int] = None,
+    ) -> TaskPagedList:
+        query: dict = {}
+        if page is not None:
+            query["page"] = page
+        if page_size is not None:
+            query["pagesize"] = page_size
+        if status is not None:
+            query["status"] = status
+        if start_time is not None:
+            query["starttime"] = start_time
+        if end_time is not None:
+            query["endtime"] = end_time
+        body = await self._gateway.gateway_request(
+            method="GET",
+            path=lux3d_path(self._region, "/generate/task/list"),
+            query=query,
+        )
+        return cast(TaskPagedList, assert_cmd_success(body, "tasks.list"))

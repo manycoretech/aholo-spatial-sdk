@@ -6,9 +6,12 @@ import com.manycoreapis.sdk.core.CmdSupport;
 import com.manycoreapis.sdk.core.JsonSupport;
 import com.manycoreapis.sdk.core.PollSupport;
 import com.manycoreapis.sdk.lux3d.model.TaskResult;
+import com.manycoreapis.sdk.lux3d.model.TaskListParams;
+import com.manycoreapis.sdk.lux3d.model.TaskPagedList;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** Lux3D task query and polling resource. */
@@ -45,6 +48,28 @@ public class TasksResource {
             throw new BusinessException("Lux3D task query returned incomplete data", null, dataMap);
         }
         return JsonSupport.MAPPER.convertValue(dataMap, TaskResult.class);
+    }
+
+    /** GET /lux3d/v1/generate/task/list */
+    @SuppressWarnings("unchecked")
+    public TaskPagedList list(TaskListParams params) {
+        TaskListParams effective = params == null ? TaskListParams.empty() : params;
+        Map<String, Object> query = new LinkedHashMap<String, Object>();
+        effective.page().ifPresent(value -> query.put("page", value));
+        effective.pageSize().ifPresent(value -> query.put("pagesize", value));
+        effective.status().ifPresent(value -> query.put("status", value));
+        effective.startTime().ifPresent(value -> query.put("starttime", value));
+        effective.endTime().ifPresent(value -> query.put("endtime", value));
+
+        Map<String, Object> body = gateway.gatewayRequest(
+                "GET", pathPrefix + "/generate/task/list", query, null, null);
+        CmdSupport.assertCmdOk(body, "list tasks");
+        Object data = body.get("d");
+        if (!(data instanceof Map)) {
+            throw new BusinessException("Lux3D task list returned no data",
+                    body.get("c") == null ? null : String.valueOf(body.get("c")), body);
+        }
+        return JsonSupport.MAPPER.convertValue((Map<String, Object>) data, TaskPagedList.class);
     }
 
     /** Poll task result until status is 3 (success) or 4 (failed). */

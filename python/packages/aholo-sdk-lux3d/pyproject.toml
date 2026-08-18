@@ -1,11 +1,11 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling<1.32"]
 build-backend = "hatchling.build"
 
 [project]
 name = "manycore-aholo-sdk-lux3d"
-version = "1.4.0"
-description = "Aholo Lux3D client"
+version = "1.5.0"
+description = "Aholo Lux3D generation, part split, and task history client"
 license = "MIT"
 requires-python = ">=3.9"
 dependencies = ["manycore-aholo-sdk-core>=1.2.0,<2.0.0"]

@@ -22,3 +22,17 @@ class _Lux3dTaskResultBase(TypedDict):
 
 class Lux3dTaskResult(_Lux3dTaskResultBase, total=False):
     outputs: List[TaskOutput]
+
+
+class TaskListItem(TypedDict, total=False):
+    taskId: int
+    status: int
+    created: int
+    lastModified: int
+
+
+class TaskPagedList(TypedDict, total=False):
+    items: List[TaskListItem]
+    total: int
+    page: int
+    pageSize: int

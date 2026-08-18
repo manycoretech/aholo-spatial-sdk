@@ -85,7 +85,7 @@ public final class ImgTo3dCreateParams {
         public Builder outputFormat(List<String> outputFormat){ this.outputFormat = outputFormat; return this; }
         /** G1 only: generate textured/PBR mesh (default true). */
         public Builder enablePbr(Boolean enablePbr)          { this.enablePbr = enablePbr; return this; }
-        /** G1 only: texture size when enablePbr is true (default 1000). */
+        /** G1 only: texture size when enablePbr is true (default 2048). */
         public Builder textureSize(Integer textureSize)      { this.textureSize = textureSize; return this; }
 
         public ImgTo3dCreateParams build() {

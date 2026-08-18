@@ -1,6 +1,7 @@
 export { createLux3dClient, Lux3dClient } from './lux3d-client.js';
 export { ImgTo3dResource } from './resources/img-to-3d.js';
 export { MaterialTransferResource } from './resources/material-transfer.js';
+export { PartSplitResource } from './resources/part-split.js';
 export { TasksResource } from './resources/tasks.js';
 export { TextTo3dResource } from './resources/text-to-3d.js';
 export { bufferToDataUrl, fileToDataUrl, guessMimeType } from './image.js';
@@ -16,10 +17,15 @@ export {
   type Lux3dTaskStatus,
   type Lux3dVersion,
   type MaterialTransferRequest,
+  type PartSplitRequest,
   type TaskCreateResponse,
   type TaskOutput,
   type TaskQueryData,
   type TaskQueryResponse,
+  type TaskListData,
+  type TaskListItem,
+  type TaskListParams,
+  type TaskListResponse,
   type TextTo3dRequest,
   type WaitForLux3dTaskOptions,
 } from './types.js';

@@ -1,7 +1,7 @@
 {
   "name": "@manycore/aholo-sdk-lux3d",
-  "version": "1.4.0",
-  "description": "Aholo Lux3D image/text-to-3D and material transfer client",
+  "version": "1.5.0",
+  "description": "Aholo Lux3D generation, part split, and task history client",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -25,8 +25,9 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "test": "tsx test/new-apis.test.ts",
     "clean": "rm -rf dist",
-    "generate": "openapi-typescript \"${LUX3D_OPENAPI_SPEC:?Set LUX3D_OPENAPI_SPEC to the path of lux3d openapi.yaml}\" -o src/generated/lux3d-api.ts"
+    "generate": "openapi-typescript \"${LUX3D_OPENAPI_SPEC:?Set LUX3D_OPENAPI_SPEC to the path of lux3d openapi.yaml}\" --default-non-nullable false -o src/generated/lux3d-api.ts"
   },
   "dependencies": {
     "@manycore/aholo-sdk-core": "^1.2.0"

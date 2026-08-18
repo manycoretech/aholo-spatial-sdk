@@ -13,7 +13,7 @@ Official Python SDKs for the [Aholo](https://labs.aholo3d.com) Open API.
 | Package | Version | Description |
 |---------|---------|-------------|
 | `manycore-aholo-sdk-asset` | [![PyPI](https://img.shields.io/pypi/v/manycore-aholo-sdk-asset?color=3775A9&logo=pypi&logoColor=white)](https://pypi.org/project/manycore-aholo-sdk-asset/) | File upload (single & multipart, resume support) |
-| `manycore-aholo-sdk-lux3d` | [![PyPI](https://img.shields.io/pypi/v/manycore-aholo-sdk-lux3d?color=3775A9&logo=pypi&logoColor=white)](https://pypi.org/project/manycore-aholo-sdk-lux3d/) | Lux3D image/text-to-3D generation, material transfer |
+| `manycore-aholo-sdk-lux3d` | [![PyPI](https://img.shields.io/pypi/v/manycore-aholo-sdk-lux3d?color=3775A9&logo=pypi&logoColor=white)](https://pypi.org/project/manycore-aholo-sdk-lux3d/) | Lux3D generation, material transfer, part split, task history |
 | `manycore-aholo-sdk-world` | [![PyPI](https://img.shields.io/pypi/v/manycore-aholo-sdk-world?color=3775A9&logo=pypi&logoColor=white)](https://pypi.org/project/manycore-aholo-sdk-world/) | 3DGS world reconstruction & generation |
 | `manycore-aholo-sdk-core` | [![PyPI](https://img.shields.io/pypi/v/manycore-aholo-sdk-core?color=3775A9&logo=pypi&logoColor=white)](https://pypi.org/project/manycore-aholo-sdk-core/) | Shared HTTP client, auth, error types, polling |
 

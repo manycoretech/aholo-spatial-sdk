@@ -2,6 +2,7 @@ import { createGatewayClient, type AholoClientConfig, type AholoGatewayClient } 
 
 import { ImgTo3dResource } from './resources/img-to-3d.js';
 import { MaterialTransferResource } from './resources/material-transfer.js';
+import { PartSplitResource } from './resources/part-split.js';
 import { TasksResource } from './resources/tasks.js';
 import { TextTo3dResource } from './resources/text-to-3d.js';
 
@@ -15,7 +16,9 @@ import { TextTo3dResource } from './resources/text-to-3d.js';
  * await lux3d.imgTo3d.createFromFile('/path/to/image.png')
  * await lux3d.textTo3d.create({ prompt: '...' })
  * await lux3d.materialTransfer.create({ img: '...', meshUrl: '...' })
+ * await lux3d.partSplit.create({ glbUrl: '...' })
  * await lux3d.tasks.retrieve(taskId)
+ * await lux3d.tasks.list()
  * await lux3d.tasks.waitFor(taskId)
  * ```
  */
@@ -23,6 +26,7 @@ export class Lux3dClient {
   readonly imgTo3d: ImgTo3dResource;
   readonly textTo3d: TextTo3dResource;
   readonly materialTransfer: MaterialTransferResource;
+  readonly partSplit: PartSplitResource;
   readonly tasks: TasksResource;
 
   private readonly gateway: AholoGatewayClient;
@@ -32,6 +36,7 @@ export class Lux3dClient {
     this.imgTo3d = new ImgTo3dResource(this.gateway, config.region);
     this.textTo3d = new TextTo3dResource(this.gateway, config.region);
     this.materialTransfer = new MaterialTransferResource(this.gateway, config.region);
+    this.partSplit = new PartSplitResource(this.gateway, config.region);
     this.tasks = new TasksResource(this.gateway, config.region);
   }
 

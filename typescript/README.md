@@ -13,7 +13,7 @@ Official TypeScript/Node.js SDKs for the [Aholo](https://labs.aholo3d.com) Open 
 | Package | Version | Description |
 |---------|---------|-------------|
 | `@manycore/aholo-sdk-asset` | [![npm](https://img.shields.io/npm/v/@manycore/aholo-sdk-asset?color=CB3837&logo=npm)](https://www.npmjs.com/package/@manycore/aholo-sdk-asset) | File upload (single & multipart, resume support) |
-| `@manycore/aholo-sdk-lux3d` | [![npm](https://img.shields.io/npm/v/@manycore/aholo-sdk-lux3d?color=CB3837&logo=npm)](https://www.npmjs.com/package/@manycore/aholo-sdk-lux3d) | Lux3D image/text-to-3D generation, material transfer |
+| `@manycore/aholo-sdk-lux3d` | [![npm](https://img.shields.io/npm/v/@manycore/aholo-sdk-lux3d?color=CB3837&logo=npm)](https://www.npmjs.com/package/@manycore/aholo-sdk-lux3d) | Lux3D generation, material transfer, part split, task history |
 | `@manycore/aholo-sdk-world` | [![npm](https://img.shields.io/npm/v/@manycore/aholo-sdk-world?color=CB3837&logo=npm)](https://www.npmjs.com/package/@manycore/aholo-sdk-world) | 3DGS world reconstruction & generation |
 | `@manycore/aholo-sdk-core` | [![npm](https://img.shields.io/npm/v/@manycore/aholo-sdk-core?color=CB3837&logo=npm)](https://www.npmjs.com/package/@manycore/aholo-sdk-core) | Shared HTTP client, auth, error types, polling |
 

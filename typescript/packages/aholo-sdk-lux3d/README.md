@@ -1,6 +1,6 @@
 # @manycore/aholo-sdk-lux3d
 
-Official TypeScript/Node.js SDK for [Aholo](https://labs.aholo3d.com) Lux3D — image/text-to-3D generation and material transfer.
+Official TypeScript/Node.js SDK for [Aholo](https://labs.aholo3d.com) Lux3D — 3D generation, material transfer, part split, and task history.
 
 **Requirements:** Node.js ≥ 18
 
@@ -72,6 +72,27 @@ const taskId = await lux3d.materialTransfer.create({
   outputFormat: ['zip', 'glb'],
 });
 const result = await lux3d.tasks.waitFor(taskId);
+```
+
+### Part Split
+
+```typescript
+const taskId = await lux3d.partSplit.create({
+  glbUrl: 'https://example.com/model.glb',
+});
+const result = await lux3d.tasks.waitFor(taskId);
+console.log(result.outputs[0]?.content); // one GLB containing independent parts
+```
+
+### List Tasks
+
+```typescript
+const page = await lux3d.tasks.list({
+  page: 1,
+  pageSize: 20,
+  status: 3,
+});
+console.log(page.items, page.total);
 ```
 
 ### Version differences

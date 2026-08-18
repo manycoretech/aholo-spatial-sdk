@@ -5,6 +5,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Lux3D 1.5.0] - 2026-08-18
+
+### Added
+
+- **Lux3D API**: GLB part-split task creation via `partSplit.create` / `part_split.create`.
+- **Lux3D API**: Paginated generation records via `tasks.list`, with status and creation-time filters.
+- **TypeScript / Python / Java**: Models and resource methods for part split and task history; Python includes synchronous and asynchronous variants.
+- Cross-language tests for endpoint paths, query mapping, and response decoding.
+
+### Changed
+
+- Bumped Lux3D packages only (`@manycore/aholo-sdk-lux3d`, `manycore-aholo-sdk-lux3d`, `com.manycoreapis:aholo-sdk-lux3d`) to **1.5.0**.
+- Updated the documented G1 default `textureSize` from 1000 to 2048.
+
 ## [Lux3D 1.4.0] - 2026-07-20
 
 ### Added
@@ -93,6 +107,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Repository initialized.
 
+[lux3d-1.5.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.4.0...lux3d/v1.5.0
 [lux3d-1.4.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.3.0...lux3d/v1.4.0
 [lux3d-1.3.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.2.0...lux3d/v1.3.0
 [1.3.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/world/v1.2.0...world/v1.3.0

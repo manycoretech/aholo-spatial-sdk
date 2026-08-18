@@ -6,6 +6,7 @@ from manycore.aholo_sdk_core import AholoClientConfig, create_async_gateway_clie
 
 from .resources.img_to_3d import AsyncImgTo3dResource
 from .resources.material_transfer import AsyncMaterialTransferResource
+from .resources.part_split import AsyncPartSplitResource
 from .resources.tasks import AsyncTasksResource
 from .resources.text_to_3d import AsyncTextTo3dResource
 
@@ -21,6 +22,7 @@ class AsyncLux3dClient:
         self.img_to_3d = AsyncImgTo3dResource(gateway, region)
         self.text_to_3d = AsyncTextTo3dResource(gateway, region)
         self.material_transfer = AsyncMaterialTransferResource(gateway, region)
+        self.part_split = AsyncPartSplitResource(gateway, region)
         self.tasks = AsyncTasksResource(gateway, region)
 
     async def close(self) -> None:

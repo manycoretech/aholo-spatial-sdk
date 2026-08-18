@@ -15,6 +15,9 @@ import {
   type Lux3dTaskResult,
   type TaskQueryData,
   type TaskQueryResponse,
+  type TaskListData,
+  type TaskListParams,
+  type TaskListResponse,
   type WaitForLux3dTaskOptions,
 } from '../types.js';
 
@@ -23,6 +26,10 @@ const DEFAULT_POLL_TIMEOUT_MS = 600_000;
 
 function assertQueryData(body: TaskQueryResponse, context: string): TaskQueryData {
   return assertCmdSuccess(body as CmdEnvelope<TaskQueryData>, context);
+}
+
+function assertListData(body: TaskListResponse, context: string): TaskListData {
+  return assertCmdSuccess(body as CmdEnvelope<TaskListData>, context);
 }
 
 function toTaskResult(data: TaskQueryData): Lux3dTaskResult {
@@ -52,6 +59,25 @@ export class TasksResource {
         signal: options?.signal,
       })
       .then((body) => toTaskResult(assertQueryData(body, 'tasks.retrieve')));
+  }
+
+  /** `GET /generate/task/list` */
+  list(params: TaskListParams = {}, options?: Lux3dRequestOptions): Promise<TaskListData> {
+    const query: Record<string, string> = {};
+    if (params.page !== undefined) query.page = String(params.page);
+    if (params.pageSize !== undefined) query.pagesize = String(params.pageSize);
+    if (params.status !== undefined) query.status = String(params.status);
+    if (params.startTime !== undefined) query.starttime = String(params.startTime);
+    if (params.endTime !== undefined) query.endtime = String(params.endTime);
+
+    return this.gateway
+      .gatewayRequest<TaskListResponse>({
+        method: 'GET',
+        path: lux3dPath(this.region, '/generate/task/list'),
+        query,
+        signal: options?.signal,
+      })
+      .then((body) => assertListData(body, 'tasks.list'));
   }
 
   /** Poll task until success or failure. */
