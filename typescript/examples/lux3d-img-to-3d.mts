@@ -1,9 +1,7 @@
 /**
  * Minimal example: image-to-3D with Lux3D, poll until the model URLs are ready.
  *
- * v3.0-standard / v2.0-preview: zip + glb + optional usdz/obj/fbx via outputFormat
- * v1.0-pro:                     single ZIP
- * G1:                           zip / glb / ply via outputFormat
+ * G1 / G1-Turbo: zip / glb / ply via outputFormat
  *
  * Usage:
  *   AHOLO_API_KEY=xxx npx tsx examples/lux3d-img-to-3d.mts ./chair.png
@@ -20,7 +18,7 @@ const region = (process.env.AHOLO_REGION ?? 'cn') as 'cn' | 'com';
 const lux3d = createLux3dClient({ region });
 
 console.log(`Creating img-to-3D task from ${filePath} ...`);
-const taskId = await lux3d.imgTo3d.createFromFile(filePath);
+const taskId = await lux3d.imgTo3d.createFromFile(filePath, { version: 'G1' });
 console.log(`taskId=${taskId}, polling...`);
 
 const t0 = Date.now();

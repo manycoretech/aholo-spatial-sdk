@@ -21,6 +21,14 @@ export class ImgTo3dResource {
 
   /** `POST /generate/img-to-3d/task/create` */
   async create(body: ImgTo3dRequest, options?: Lux3dRequestOptions): Promise<number> {
+    const hasImg = body.img !== undefined;
+    const hasImgs = body.imgs !== undefined;
+    if (hasImg === hasImgs) {
+      throw new TypeError('Provide exactly one of img or imgs');
+    }
+    if (body.imgs && (body.imgs.length < 1 || body.imgs.length > 32)) {
+      throw new RangeError('imgs must contain between 1 and 32 images');
+    }
     const response = await this.gateway.gatewayRequest<TaskCreateResponse>({
       method: 'POST',
       path: lux3dPath(this.region, '/generate/img-to-3d/task/create'),
@@ -33,7 +41,7 @@ export class ImgTo3dResource {
   /** Create img-to-3D task from a local image file (encodes to Data URL automatically). */
   async createFromFile(
     filePath: string,
-    request: Omit<ImgTo3dRequest, 'img' | 'imgs'> = {},
+    request: Omit<ImgTo3dRequest, 'img' | 'imgs'>,
     options?: Lux3dRequestOptions,
   ): Promise<number> {
     const img = await fileToDataUrl(filePath);
@@ -46,7 +54,7 @@ export class ImgTo3dResource {
    */
   async createFromFiles(
     filePaths: string[],
-    request: Omit<ImgTo3dRequest, 'img' | 'imgs'> = {},
+    request: Omit<ImgTo3dRequest, 'img' | 'imgs'>,
     options?: Lux3dRequestOptions,
   ): Promise<number> {
     const imgs = await Promise.all(filePaths.map((path) => fileToDataUrl(path)));

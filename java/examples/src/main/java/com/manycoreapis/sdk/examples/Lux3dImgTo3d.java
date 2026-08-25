@@ -2,6 +2,7 @@ package com.manycoreapis.sdk.examples;
 
 import com.manycoreapis.sdk.core.AholoClientConfig;
 import com.manycoreapis.sdk.lux3d.Lux3dClient;
+import com.manycoreapis.sdk.lux3d.model.ImgTo3dCreateParams;
 import com.manycoreapis.sdk.lux3d.model.TaskResult;
 
 import java.nio.file.Paths;
@@ -9,9 +10,7 @@ import java.nio.file.Paths;
 /**
  * Minimal example: image-to-3D with Lux3D, poll until the model URLs are ready.
  *
- * v3.0-standard / v2.0-preview: zip + glb + optional usdz/obj/fbx via outputFormat
- * v1.0-pro:                     single ZIP
- * G1:                           zip / glb / ply via outputFormat
+ * G1 / G1-Turbo: zip / glb / ply via outputFormat
  *
  * Usage:
  *   AHOLO_API_KEY=xxx mvn exec:java -pl examples \
@@ -30,7 +29,8 @@ public class Lux3dImgTo3d {
         Lux3dClient lux3d = Lux3dClient.create(AholoClientConfig.ofRegion(region));
 
         System.out.println("Creating img-to-3D task from " + filePath + " ...");
-        long taskId = lux3d.imgTo3d().createFromFile(Paths.get(filePath));
+        long taskId = lux3d.imgTo3d().createFromFile(
+                Paths.get(filePath), ImgTo3dCreateParams.builder().version("G1").build());
         System.out.println("taskId=" + taskId + ", polling...");
 
         long t0 = System.currentTimeMillis();

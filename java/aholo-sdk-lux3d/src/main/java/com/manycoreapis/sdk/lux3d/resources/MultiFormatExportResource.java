@@ -1,24 +1,21 @@
 package com.manycoreapis.sdk.lux3d.resources;
 
 import com.manycoreapis.sdk.core.AholoGatewayClient;
-import com.manycoreapis.sdk.lux3d.model.PartSplitCreateParams;
+import com.manycoreapis.sdk.lux3d.model.MultiFormatExportCreateParams;
 
 import java.util.Map;
 
-/** GLB part-split resource. */
-public class PartSplitResource {
+/** Multi-format export resource. */
+public class MultiFormatExportResource {
     private final AholoGatewayClient gateway;
     private final String pathPrefix;
-
-    public PartSplitResource(AholoGatewayClient gateway, String pathPrefix) {
+    public MultiFormatExportResource(AholoGatewayClient gateway, String pathPrefix) {
         this.gateway = gateway;
         this.pathPrefix = pathPrefix;
     }
-
-    /** POST /lux3d/v1/part-split/task/create */
-    public long create(PartSplitCreateParams params) {
+    public long create(MultiFormatExportCreateParams params) {
         Map<String, Object> response = gateway.gatewayRequest(
-                "POST", pathPrefix + "/part-split/task/create", null, null, params);
+                "POST", pathPrefix + "/multi-format-export/task/create", null, null, params);
         return Lux3dSupport.extractTaskId(response);
     }
 }

@@ -10,6 +10,7 @@ import {
 import { lux3dPath } from '../paths.js';
 import {
   LUX3D_STATUS_FAILED,
+  LUX3D_STATUS_CANCELED,
   LUX3D_STATUS_SUCCESS,
   type Lux3dRequestOptions,
   type Lux3dTaskResult,
@@ -38,6 +39,7 @@ function toTaskResult(data: TaskQueryData): Lux3dTaskResult {
   }
   return {
     taskId: data.taskId,
+    ...(data.bizId !== undefined ? { bizId: data.bizId } : {}),
     status: data.status,
     outputs: data.outputs ?? [],
   };
@@ -85,7 +87,8 @@ export class TasksResource {
     return pollUntil({
       fn: () => this.retrieve(taskId, { signal: options.signal }),
       isDone: (result) => result.status === LUX3D_STATUS_SUCCESS,
-      isFailed: (result) => result.status === LUX3D_STATUS_FAILED,
+      isFailed: (result) =>
+        result.status === LUX3D_STATUS_FAILED || result.status === LUX3D_STATUS_CANCELED,
       failMessage: (result) => `Lux3D task failed (taskId=${taskId}, status=${result.status})`,
       poll: {
         intervalMs: options.intervalMs ?? DEFAULT_POLL_INTERVAL_MS,

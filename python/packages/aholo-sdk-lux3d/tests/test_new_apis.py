@@ -1,7 +1,13 @@
 import asyncio
 import unittest
 
-from manycore.aholo_sdk_lux3d.resources.part_split import AsyncPartSplitResource, PartSplitResource
+from manycore.aholo_sdk_lux3d.resources.image_to_four_view import (
+    AsyncImageToFourViewResource, ImageToFourViewResource,
+)
+from manycore.aholo_sdk_lux3d.resources.material_transfer import MaterialTransferResource
+from manycore.aholo_sdk_lux3d.resources.multi_format_export import (
+    AsyncMultiFormatExportResource, MultiFormatExportResource,
+)
 from manycore.aholo_sdk_lux3d.resources.tasks import AsyncTasksResource, TasksResource
 
 
@@ -11,9 +17,13 @@ class FakeGateway:
 
     def gateway_request(self, **kwargs):
         self.requests.append(kwargs)
-        if kwargs["path"].endswith("/part-split/task/create"):
-            return {"c": "0", "m": "", "d": 42}
-        return {"c": "0", "m": "", "d": {"items": [], "total": 0, "page": 2, "pageSize": 10}}
+        if kwargs["method"] == "POST":
+            return {"c": "0", "m": "", "d": 42, "f": None}
+        if kwargs["path"].endswith("/task/get"):
+            return {"c": "0", "m": "", "d": {
+                "taskId": 42, "bizId": "LUX_3D", "status": 6, "outputs": []}}
+        return {"c": "0", "m": "", "d": {
+            "items": [], "total": 0, "page": 2, "pageSize": 10}}
 
 
 class AsyncFakeGateway(FakeGateway):
@@ -22,35 +32,55 @@ class AsyncFakeGateway(FakeGateway):
 
 
 class NewApisTest(unittest.TestCase):
-    def test_part_split(self):
+    def test_image_to_four_view(self):
         gateway = FakeGateway()
-        task_id = PartSplitResource(gateway, "cn").create(glb_url="https://example.com/model.glb")
+        task_id = ImageToFourViewResource(gateway, "cn").create(
+            img="https://example.com/image.png")
         self.assertEqual(42, task_id)
-        self.assertEqual("/lux3d/v1/part-split/task/create", gateway.requests[0]["path"])
-        self.assertEqual({"glbUrl": "https://example.com/model.glb"}, gateway.requests[0]["body"])
+        self.assertEqual("/lux3d/v1/generate/image-to-four-view/task/create",
+                         gateway.requests[0]["path"])
 
-    def test_task_list(self):
+    def test_multi_format_export(self):
         gateway = FakeGateway()
-        result = TasksResource(gateway, "com").list(
-            page=2, page_size=10, status=3, start_time=100, end_time=200
+        task_id = MultiFormatExportResource(gateway, "com").create(
+            model_url="https://example.com/model.glb", output_format=["usdz"])
+        self.assertEqual(42, task_id)
+        self.assertEqual("/global/lux3d/v1/multi-format-export/task/create",
+                         gateway.requests[0]["path"])
+        with self.assertRaises(ValueError):
+            MultiFormatExportResource(gateway, "cn").create(
+                model_url="https://example.com/model.glb")
+
+    def test_material_transfer_new_fields(self):
+        gateway = FakeGateway()
+        MaterialTransferResource(gateway, "cn").create(
+            img="https://example.com/material.png",
+            mesh_url="https://example.com/model.glb",
+            version="v3.0-standard",
+            ai_predict_size=False,
+            custom_size=120.5,
         )
-        self.assertEqual(0, result["total"])
-        self.assertEqual("/global/lux3d/v1/generate/task/list", gateway.requests[0]["path"])
-        self.assertEqual(
-            {"page": 2, "pagesize": 10, "status": 3, "starttime": 100, "endtime": 200},
-            gateway.requests[0]["query"],
-        )
+        self.assertEqual(False, gateway.requests[0]["body"]["aiPredictSize"])
+        self.assertEqual(120.5, gateway.requests[0]["body"]["customSize"])
+
+    def test_tasks_include_biz_id_and_accept_canceled(self):
+        gateway = FakeGateway()
+        tasks = TasksResource(gateway, "com")
+        result = tasks.retrieve(42)
+        self.assertEqual("LUX_3D", result["bizId"])
+        page = tasks.list(status=6)
+        self.assertEqual(0, page["total"])
+        self.assertEqual(6, gateway.requests[1]["query"]["status"])
 
     def test_async_resources(self):
         async def run():
             gateway = AsyncFakeGateway()
-            task_id = await AsyncPartSplitResource(gateway, "cn").create(
-                glb_url="https://example.com/model.glb"
-            )
-            page = await AsyncTasksResource(gateway, "cn").list()
-            self.assertEqual(42, task_id)
-            self.assertEqual(0, page["total"])
-            self.assertEqual({}, gateway.requests[1]["query"])
+            four_view_id = await AsyncImageToFourViewResource(gateway, "cn").create(
+                img="https://example.com/image.png")
+            export_id = await AsyncMultiFormatExportResource(gateway, "cn").create(
+                model_url="https://example.com/model.glb", output_format=["obj_zip"])
+            page = await AsyncTasksResource(gateway, "cn").list(status=6)
+            self.assertEqual((42, 42, 0), (four_view_id, export_id, page["total"]))
 
         asyncio.run(run())
 

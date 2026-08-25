@@ -1,6 +1,6 @@
 # @manycore/aholo-sdk-lux3d
 
-Official TypeScript/Node.js SDK for [Aholo](https://labs.aholo3d.com) Lux3D — 3D generation, material transfer, part split, and task history.
+Official TypeScript/Node.js SDK for Aholo Lux3D generation, material transfer, multi-format export, and task history.
 
 **Requirements:** Node.js ≥ 18
 
@@ -10,105 +10,86 @@ Official TypeScript/Node.js SDK for [Aholo](https://labs.aholo3d.com) Lux3D — 
 npm install @manycore/aholo-sdk-lux3d
 ```
 
-## Quick Start
-
 ```typescript
 import { createLux3dClient } from '@manycore/aholo-sdk-lux3d';
 
 const lux3d = createLux3dClient({ region: 'com' }); // or 'cn'
 ```
 
-Set `AHOLO_API_KEY` env var, or pass `apiKey` in the config.
+Set `AHOLO_API_KEY`, or pass `apiKey` in the client config.
 
-### Image to 3D
-
-```typescript
-const taskId = await lux3d.imgTo3d.create({ img: 'https://example.com/object.jpg' });
-const result = await lux3d.tasks.waitFor(taskId);
-console.log(result.outputs[0]?.content); // default .zip download URL
-```
-
-### Image to 3D (from local file)
+## Image to four views
 
 ```typescript
-const taskId = await lux3d.imgTo3d.createFromFile('./object.jpg');
-const result = await lux3d.tasks.waitFor(taskId);
+const taskId = await lux3d.imageToFourView.create({
+  img: 'https://example.com/object.jpg',
+});
 ```
 
-### Output formats & face count
+## Image to 3D
 
 ```typescript
 const taskId = await lux3d.imgTo3d.create({
   img: 'https://example.com/object.jpg',
-  faceCount: 80_000,
-  outputFormat: ['zip', 'glb', 'usdz', 'obj_zip'],
+  version: 'G1', // or G1-Turbo
+  faceCount: 200_000,
+  outputFormat: ['zip', 'glb', 'ply'],
+  enablePbr: true,
+  aiPredictSize: true,
 });
 ```
 
-### G1 multi-view (local files)
+For local files, the required version is passed separately:
 
 ```typescript
-const taskId = await lux3d.imgTo3d.createFromFiles(
-  ['./view1.png', './view2.png', './view3.png'],
-  { version: 'G1', outputFormat: ['glb'], enablePbr: true },
+await lux3d.imgTo3d.createFromFile('./object.jpg', { version: 'G1' });
+await lux3d.imgTo3d.createFromFiles(
+  ['./view1.png', './view2.png'],
+  { version: 'G1-Turbo', outputFormat: ['glb'] },
 );
 ```
 
-### Text to 3D
+## Text to 3D
 
 ```typescript
-const taskId = await lux3d.textTo3d.create({
+await lux3d.textTo3d.create({
   prompt: 'A wooden chair with carved legs',
+  version: 'G1-Turbo',
+  outputFormat: ['glb'],
 });
-const result = await lux3d.tasks.waitFor(taskId);
 ```
 
-### Material Transfer
+## Material transfer
 
 ```typescript
-const taskId = await lux3d.materialTransfer.create({
+await lux3d.materialTransfer.create({
   img: 'https://example.com/material.jpg',
   meshUrl: 'https://example.com/model.glb',
-  outputFormat: ['zip', 'glb'],
+  version: 'v3.0-standard',
+  outputFormat: ['zip', 'glb', 'usdz'],
+  aiPredictSize: false,
+  customSize: 120,
 });
-const result = await lux3d.tasks.waitFor(taskId);
 ```
 
-### Part Split
+## Multi-format export
 
 ```typescript
-const taskId = await lux3d.partSplit.create({
-  glbUrl: 'https://example.com/model.glb',
+await lux3d.multiFormatExport.create({
+  modelUrl: 'https://example.com/model.glb',
+  outputFormat: ['usdz', 'obj_zip', 'fbx_zip'],
 });
-const result = await lux3d.tasks.waitFor(taskId);
-console.log(result.outputs[0]?.content); // one GLB containing independent parts
 ```
 
-### List Tasks
+## Tasks
 
 ```typescript
-const page = await lux3d.tasks.list({
-  page: 1,
-  pageSize: 20,
-  status: 3,
-});
-console.log(page.items, page.total);
+const result = await lux3d.tasks.retrieve(taskId);
+const page = await lux3d.tasks.list({ status: 6 });
+const completed = await lux3d.tasks.waitFor(taskId);
 ```
 
-### Version differences
-
-| Version | Default | Outputs |
-|---------|---------|---------|
-| `v3.0-standard` | ✓ | Five slots: zip / glb / usdz / obj_zip / fbx_zip; unrequested → `NOT_REQUESTED` |
-| `v2.0-preview` | | Same five-slot layout as v3 |
-| `v1.0-pro` | | Single ZIP |
-| `G1` (beta) | | `results.zip` / `tex_mesh.glb`\|`mesh.glb` / `gaussian.ply` via `outputFormat`; `enablePbr` / `textureSize` |
-
-Use `outputFormat` (string array) instead of the removed `needUsdz` / `needObj` / `needFbx`. `faceCount` (10_000–500_000) applies to v2 / v3 / G1; v1 ignores it.
-
-## Full Documentation
-
-See the [TypeScript SDK README](https://github.com/manycoretech/aholo-spatial-sdk/tree/main/typescript) for complete API reference and examples.
+Statuses are `0` init, `1` running, `3` success, `4` failed, and `6` canceled. Polling rejects on failed or canceled tasks.
 
 ## License
 

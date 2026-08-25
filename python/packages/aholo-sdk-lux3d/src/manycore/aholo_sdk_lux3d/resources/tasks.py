@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional, cast
 from manycore.aholo_sdk_core import BusinessError, assert_cmd_success, poll_until
 
 from .._paths import lux3d_path
-from ..types import LUX3D_STATUS_FAILED, LUX3D_STATUS_SUCCESS, Lux3dTaskResult, TaskPagedList
+from ..types import LUX3D_STATUS_CANCELED, LUX3D_STATUS_FAILED, LUX3D_STATUS_SUCCESS, Lux3dTaskResult, TaskPagedList
 
 if TYPE_CHECKING:
     from manycore.aholo_sdk_core import AholoGatewayClient
@@ -29,11 +29,14 @@ class TasksResource:
         data = assert_cmd_success(body, "tasks.retrieve")
         if data.get("taskId") is None or data.get("status") is None:
             raise BusinessError("Lux3D task query returned incomplete data", body=data)
-        return Lux3dTaskResult(
+        result = Lux3dTaskResult(
             taskId=data["taskId"],
             status=data["status"],
             outputs=data.get("outputs") or [],
         )
+        if data.get("bizId") is not None:
+            result["bizId"] = data["bizId"]
+        return result
 
     def wait_for(
         self,
@@ -46,7 +49,7 @@ class TasksResource:
         return poll_until(
             lambda: self.retrieve(task_id),
             is_done=lambda r: r.get("status") == LUX3D_STATUS_SUCCESS,
-            is_failed=lambda r: r.get("status") == LUX3D_STATUS_FAILED,
+            is_failed=lambda r: r.get("status") in (LUX3D_STATUS_FAILED, LUX3D_STATUS_CANCELED),
             fail_message=lambda r: f"Lux3D task failed taskId={task_id} status={r.get('status')}",
             interval_ms=interval_ms,
             timeout_ms=timeout_ms,
@@ -63,6 +66,8 @@ class TasksResource:
     ) -> TaskPagedList:
         """GET /generate/task/list. Omitted filters are not sent."""
         query: dict = {}
+        if status is not None and status not in (0, 1, 3, 4, 6):
+            raise ValueError("status must be one of 0, 1, 3, 4, 6")
         if page is not None:
             query["page"] = page
         if page_size is not None:
@@ -83,7 +88,7 @@ class TasksResource:
 from manycore.aholo_sdk_core import AsyncAholoGatewayClient, BusinessError, assert_cmd_success, poll_until_async
 
 from .._paths import lux3d_path
-from ..types import LUX3D_STATUS_FAILED, LUX3D_STATUS_SUCCESS, Lux3dTaskResult, TaskPagedList
+from ..types import LUX3D_STATUS_CANCELED, LUX3D_STATUS_FAILED, LUX3D_STATUS_SUCCESS, Lux3dTaskResult, TaskPagedList
 
 
 class AsyncTasksResource:
@@ -100,11 +105,14 @@ class AsyncTasksResource:
         data = assert_cmd_success(body, "tasks.retrieve")
         if data.get("taskId") is None or data.get("status") is None:
             raise BusinessError("Lux3D task query returned incomplete data", body=data)
-        return Lux3dTaskResult(
+        result = Lux3dTaskResult(
             taskId=data["taskId"],
             status=data["status"],
             outputs=data.get("outputs") or [],
         )
+        if data.get("bizId") is not None:
+            result["bizId"] = data["bizId"]
+        return result
 
     async def wait_for(
         self,
@@ -116,7 +124,7 @@ class AsyncTasksResource:
         return await poll_until_async(
             lambda: self.retrieve(task_id),
             is_done=lambda r: r.get("status") == LUX3D_STATUS_SUCCESS,
-            is_failed=lambda r: r.get("status") == LUX3D_STATUS_FAILED,
+            is_failed=lambda r: r.get("status") in (LUX3D_STATUS_FAILED, LUX3D_STATUS_CANCELED),
             fail_message=lambda r: f"Lux3D task failed taskId={task_id} status={r.get('status')}",
             interval_ms=interval_ms,
             timeout_ms=timeout_ms,
@@ -132,6 +140,8 @@ class AsyncTasksResource:
         end_time: Optional[int] = None,
     ) -> TaskPagedList:
         query: dict = {}
+        if status is not None and status not in (0, 1, 3, 4, 6):
+            raise ValueError("status must be one of 0, 1, 3, 4, 6")
         if page is not None:
             query["page"] = page
         if page_size is not None:

@@ -18,6 +18,7 @@ import java.util.Map;
 public class TasksResource {
     private static final int STATUS_SUCCESS = 3;
     private static final int STATUS_FAILED  = 4;
+    private static final int STATUS_CANCELED = 6;
 
     private final AholoGatewayClient gateway;
     private final String pathPrefix;
@@ -72,12 +73,12 @@ public class TasksResource {
         return JsonSupport.MAPPER.convertValue((Map<String, Object>) data, TaskPagedList.class);
     }
 
-    /** Poll task result until status is 3 (success) or 4 (failed). */
+    /** Poll task result until status is 3 (success), 4 (failed), or 6 (canceled). */
     public TaskResult waitFor(long taskId) throws Exception {
         return PollSupport.pollUntil(
                 () -> retrieve(taskId),
                 r -> STATUS_SUCCESS == r.status(),
-                r -> STATUS_FAILED  == r.status(),
+                r -> STATUS_FAILED == r.status() || STATUS_CANCELED == r.status(),
                 r -> "Lux3D task failed taskId=" + taskId + " status=" + r.status(),
                 Duration.ofSeconds(12),
                 Duration.ofMinutes(10)

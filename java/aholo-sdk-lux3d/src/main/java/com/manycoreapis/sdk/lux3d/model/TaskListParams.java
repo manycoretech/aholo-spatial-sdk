@@ -47,8 +47,8 @@ public final class TaskListParams {
             if (pageSize != null && (pageSize < 1 || pageSize > 100)) {
                 throw new IllegalArgumentException("pageSize must be between 1 and 100");
             }
-            if (status != null && status != 0 && status != 1 && status != 3 && status != 4) {
-                throw new IllegalArgumentException("status must be one of 0, 1, 3, 4");
+            if (status != null && status != 0 && status != 1 && status != 3 && status != 4 && status != 6) {
+                throw new IllegalArgumentException("status must be one of 0, 1, 3, 4, 6");
             }
             if (startTime != null && startTime < 0) throw new IllegalArgumentException("startTime must be >= 0");
             if (endTime != null && endTime < 0) throw new IllegalArgumentException("endTime must be >= 0");

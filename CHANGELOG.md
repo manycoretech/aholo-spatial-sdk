@@ -5,6 +5,23 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Lux3D 1.6.0] - 2026-08-25
+
+### Added
+
+- Image-to-four-view and multi-format-export resources across TypeScript, Java, and Python (sync/async).
+- `G1-Turbo`, `aiPredictSize`, material-transfer `customSize`, task `bizId`, and canceled status `6`.
+
+### Changed
+
+- Bumped all three Lux3D SDK packages to **1.6.0**.
+- Image/text generation now require `version` (`G1` or `G1-Turbo`), use a 10,000–300,000 face range, and support zip/glb/ply outputs.
+- Material transfer now requires `version="v3.0-standard"`; polling treats canceled tasks as terminal failures.
+
+### Removed
+
+- Part-split resources and the retired `textureSize` option.
+
 ## [Lux3D 1.5.0] - 2026-08-18
 
 ### Added
@@ -107,6 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Repository initialized.
 
+[lux3d-1.6.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.5.0...lux3d/v1.6.0
 [lux3d-1.5.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.4.0...lux3d/v1.5.0
 [lux3d-1.4.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.3.0...lux3d/v1.4.0
 [lux3d-1.3.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.2.0...lux3d/v1.3.0

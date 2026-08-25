@@ -29,15 +29,10 @@ public class ImgTo3dResource {
         return Lux3dSupport.extractTaskId(response);
     }
 
-    /** Reads {@code filePath}, encodes it as a base64 data-URL, and submits an img-to-3D task. */
-    public long createFromFile(Path filePath) throws Exception {
-        return createFromFile(filePath, null);
-    }
-
     /**
      * Reads {@code filePath}, encodes it as a base64 data-URL, and submits an img-to-3D task.
      * Extra parameters (e.g. {@code version}, {@code outputFormat}) are taken from {@code params};
-     * pass {@code null} to use defaults. {@code img}/{@code imgs} on {@code params} are ignored.
+     * {@code params} must include the required version; {@code img}/{@code imgs} are ignored.
      */
     public long createFromFile(Path filePath, ImgTo3dCreateParams params) throws Exception {
         String dataUrl = fileToDataUrl(filePath);
@@ -49,14 +44,7 @@ public class ImgTo3dResource {
     /**
      * Reads local image files, encodes each as a data-URL, and submits a G1 multi-view task via {@code imgs}.
      */
-    public long createFromFiles(List<Path> filePaths) throws Exception {
-        return createFromFiles(filePaths, null);
-    }
-
-    /**
-     * Reads local image files, encodes each as a data-URL, and submits a multi-view task via {@code imgs}.
-     * Extra parameters are taken from {@code params}; {@code img}/{@code imgs} on {@code params} are ignored.
-     */
+    /** Reads local images, encodes them as data URLs, and submits them through {@code imgs}. */
     public long createFromFiles(List<Path> filePaths, ImgTo3dCreateParams params) throws Exception {
         List<String> dataUrls = new ArrayList<>(filePaths.size());
         for (Path filePath : filePaths) {
@@ -75,11 +63,11 @@ public class ImgTo3dResource {
     }
 
     private static void copyOptional(ImgTo3dCreateParams params, ImgTo3dCreateParams.Builder builder) {
-        if (params == null) return;
-        params.version().ifPresent(builder::version);
+        if (params == null) throw new IllegalArgumentException("params with version is required");
+        builder.version(params.version());
         params.faceCount().ifPresent(builder::faceCount);
         params.outputFormat().ifPresent(builder::outputFormat);
         params.enablePbr().ifPresent(builder::enablePbr);
-        params.textureSize().ifPresent(builder::textureSize);
+        params.aiPredictSize().ifPresent(builder::aiPredictSize);
     }
 }

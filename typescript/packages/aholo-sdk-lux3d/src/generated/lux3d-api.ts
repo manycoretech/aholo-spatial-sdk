@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/lux3d/v1/generate/image-to-four-view/task/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 创建单图生四视图任务
+         * @description 根据一张图片创建异步四视图任务。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
+         */
+        post: operations["createImageToFourViewTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/lux3d/v1/generate/img-to-3d/task/create": {
         parameters: {
             query?: never;
@@ -14,9 +34,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 创建图生3D任务
-         * @description 创建图生3D任务，输入图片，输出异步任务。请求成功后返回任务 ID taskid，后续可通过查询接口获取任务状态和结果。
-         *     若不传 version 参数，系统默认使用 v3.0-standard 版本。
+         * 创建图生 3D 任务
+         * @description 根据一张或多张图片创建异步 3D 生成任务。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
          */
         post: operations["createImgTo3dTask"];
         delete?: never;
@@ -35,9 +54,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 创建文生3D任务
-         * @description 创建文生3D任务，输入文本或文本+图片，输出异步任务。请求成功后返回任务 ID taskid，后续可通过查询接口获取任务状态和结果。
-         *     若不传 version 参数，系统默认使用 v3.0-standard 版本。
+         * 创建文生 3D 任务
+         * @description 根据文本和一张可选参考图片创建异步 3D 生成任务。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
          */
         post: operations["createTextTo3dTask"];
         delete?: never;
@@ -57,8 +75,7 @@ export interface paths {
         put?: never;
         /**
          * 创建模型材质重绘任务
-         * @description 创建模型材质重绘任务，输入图片和模型URL，输出重绘后的模型对应的异步任务。请求成功后返回任务 ID taskid，后续可通过查询接口获取任务状态和结果。
-         *     若不传 version 参数，系统默认使用 v3.0-standard 版本。
+         * @description 根据材质参考图片和 GLB 模型创建异步材质重绘任务。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
          */
         post: operations["createMaterialTransferTask"];
         delete?: never;
@@ -67,7 +84,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/lux3d/v1/part-split/task/create": {
+    "/lux3d/v1/multi-format-export/task/create": {
         parameters: {
             query?: never;
             header?: never;
@@ -77,12 +94,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 创建部件拆分任务
-         * @description 创建部件拆分任务，输入 GLB 模型 URL，将模型拆分为多个独立部件。请求成功后返回任务 ID taskid，后续可通过查询接口获取任务状态和结果。
-         *
-         *     注意：部件拆分能力有全局并发限制，当前为单并发。若服务繁忙，请稍后再试。
+         * 创建多格式导出任务
+         * @description 根据 ZIP 或 GLB 模型 URL 创建异步格式导出任务。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
          */
-        post: operations["createPartSplitTask"];
+        post: operations["createMultiFormatExportTask"];
         delete?: never;
         options?: never;
         head?: never;
@@ -98,18 +113,7 @@ export interface paths {
         };
         /**
          * 查询生成任务
-         * @description 根据 taskid 查询图生3D、文生3D、模型材质重绘或部件拆分任务状态和结果。查询结果中的输出内容有效期为 2 小时，建议在任务成功后尽快获取并保存结果。
-         *     建议每 10-15 秒轮询查询任务状态。
-         *
-         *     图生3D / 文生3D / 材质重绘 版本输出差异：
-         *     - v1.0-pro：首版大模型，具有完整的 PBR 材质属性输出，支持透明材质生成。单格式输出，返回单个 ZIP 结果
-         *     - v2.0-preview：2.0 模型架构，重点拓展了对文字、纹理细节的保持能力，不含透明材质。支持 .zip、.glb、.usdz、_obj.zip、_fbx.zip
-         *     - v3.0-standard（默认）：新增彩色透明材质支持，减少模型生成色差，提升材质质感，保持文字和纹理细节能力，新增自定义面数，支持五格式输出；返回 .zip、.glb、.usdz、_obj.zip、_fbx.zip，依次对应 outputs[0..4]
-         *     - G1：快速 beta 版本。单独请求 outputFormat=["glb"] 时返回 tex_mesh.glb（enablePbr=true 或未传）或 mesh.glb（enablePbr=false）；单独请求 ["ply"] 时返回 gaussian.ply；未传、空数组或仅请求 zip 时返回 results.zip；组合格式按 outputFormat 顺序返回对应的多个产物 URL。PBR 开启时包内包含 mesh/mesh.glb、mesh/tex_mesh.glb、3dgs/gaussian.ply；关闭时不包含 mesh/tex_mesh.glb。默认 faceCount 为 200000，enablePbr 为 true，textureSize 为 2048
-         *     outputFormat 使用列表。v2.0-preview 和 v3.0-standard 支持 zip、glb、usdz、obj_zip、fbx_zip；G1 支持 zip、glb、ply。
-         *
-         *     部件拆分任务输出：
-         *     - 输出单个 GLB 文件，内含拆分后的多个独立部件（不以多个文件返回）。
+         * @description 根据任务 ID 查询任务状态和结果，仅支持查询当前认证账号创建的任务。结果 URL 有效期为 2 小时。
          */
         get: operations["getTask"];
         put?: never;
@@ -129,10 +133,7 @@ export interface paths {
         };
         /**
          * 分页查询生成记录
-         * @description 分页查询当前 API Key 所属账号下的 Lux3D 生成记录，可按任务状态和创建时间段筛选。
-         *     时间条件作用于任务创建时间，查询区间为 [starttime, endtime)。
-         *     列表仅返回任务 ID、状态和时间信息，不暴露版本、产物及内部模型信息。
-         *     所有可选 Query 参数均不传时，默认按 page=1、pagesize=20 查询全部状态和全部创建时间；请省略可选参数，不要传空字符串。
+         * @description 分页查询当前认证账号创建的任务，可按状态和创建时间筛选。
          */
         get: operations["listTasks"];
         put?: never;
@@ -147,15 +148,23 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description 图生3D任务请求体。v1.0-pro、v2.0-preview、v3.0-standard 必须使用 img；G1 可使用 img 单图或 imgs 多视角数组。 */
+        /** @description 单图生四视图请求体，仅需提供一张输入图片。 */
+        ImageToFourViewRequest: {
+            /**
+             * @description 单张图片 URL
+             * @example https://qhstaticssl.kujiale.com/image/jpeg/1784775590613/image_to_3d_model.jpg
+             */
+            img: string;
+        };
+        /** @description 图生 3D 请求体，img 与 imgs 必须二选一。 */
         ImgTo3dRequest: {
             /**
-             * @description 单张图片 URL 或完整 Base64 Data URL，例如 data:image/png;base64,...
+             * @description 单张图片 URL
              * @example https://qhstaticssl.kujiale.com/image/jpeg/1784775590613/image_to_3d_model.jpg
              */
             img?: string;
             /**
-             * @description G1 多视角图片列表，支持图片 URL 或完整 Data URL。单图可继续使用 img；G1 多图使用 imgs；img 与 imgs 不能同时传递。
+             * @description 1-32 张图片 URL。保留输入顺序，第一张图作为主要参考；与 img 互斥。
              * @example [
              *       "https://qhstaticssl.kujiale.com/image/png/1784775590866/multiview_input_1.png",
              *       "https://qhstaticssl.kujiale.com/image/png/1784775591151/multiview_input_2.png"
@@ -163,37 +172,36 @@ export interface components {
              */
             imgs?: string[];
             /**
-             * @description Lux3D 版本，支持 v3.0-standard（默认）、v2.0-preview、v1.0-pro、G1。不传则默认使用 v3.0-standard
-             * @default v3.0-standard
-             * @example v3.0-standard
+             * @description 必填，仅支持 G1 和 G1-Turbo。
+             * @example G1
              * @enum {string}
              */
-            version?: "v3.0-standard" | "v2.0-preview" | "v1.0-pro" | "G1";
+            version: "G1" | "G1-Turbo";
             /**
-             * @description 可选。指定目标 Mesh 的生成面数，仅影响 Mesh 产物，不影响 3DGS 产物。v2.0-preview、v3.0-standard 和 G1 支持自定义面数，取值范围为 [10000, 500000]。v2.0-preview 和 v3.0-standard 未传此参数时默认使用 60000；G1 未传此参数时默认使用 200000；v1.0-pro 忽略此参数。
-             * @example 60000
+             * @description ZIP/GLB 模型的目标面数，范围 10000-300000，默认 200000；不影响 PLY。
+             * @example 200000
              */
             faceCount?: number;
             /**
-             * @description 统一输出格式列表。v2.0-preview 和 v3.0-standard 支持 zip、glb、usdz、obj_zip、fbx_zip；G1 支持 zip、glb、ply。G1 传空数组或未传时返回 results.zip；单格式返回对应产物；组合格式按数组顺序返回多个产物 URL，只有显式包含 zip 时才返回 results.zip。
+             * @description 请求的输出格式。G1 固定返回 ZIP 和 GLB，请求包含 ply 时额外返回 PLY；G1-Turbo 返回指定格式，省略或传空数组时返回 ZIP。
              * @example [
              *       "zip",
              *       "glb"
              *     ]
              */
-            outputFormat?: ("zip" | "glb" | "usdz" | "obj_zip" | "fbx_zip" | "ply")[];
+            outputFormat?: ("zip" | "glb" | "ply")[];
             /**
-             * @description 仅 G1 版本生成 Mesh 时生效。未传或 true 生成 G1 自带 PBR 材质；false 生成白模 mesh.glb。其他版本不使用此字段。
+             * @description 仅对 G1-Turbo 的 ZIP/GLB 输出生效：true（默认）生成带材质模型，false 生成白模；不决定输出格式。G1 及仅请求 PLY 时忽略。
              * @default true
              */
             enablePbr?: boolean;
             /**
-             * @description 仅 G1 版本生成 Mesh 且 enablePbr 未传或为 true 时生效，用于设置 G1 PBR 贴图尺寸，默认 2048。其他版本不使用此字段。
-             * @default 2048
+             * @description 是否预测并应用模型尺寸，默认 true。
+             * @default true
              */
-            textureSize?: number;
+            aiPredictSize?: boolean;
         } & (unknown | unknown);
-        /** @description 文生3D任务请求体。 */
+        /** @description 文生 3D 请求体，可选提供一张 img 参考图。 */
         TextTo3dRequest: {
             /**
              * @description 文本提示词
@@ -201,51 +209,51 @@ export interface components {
              */
             prompt: string;
             /**
-             * @description 风格类型，支持 photorealistic（写实，默认值）、cartoon（卡通）、anime（二次元）、hand_painted（手绘）、cyberpunk（赛博朋克）、fantasy（奇幻）、glass（玻璃质感）。不传则默认使用 photorealistic
+             * @description 生成风格，默认 photorealistic。
              * @default photorealistic
              * @example photorealistic
              * @enum {string}
              */
             style?: "photorealistic" | "cartoon" | "anime" | "hand_painted" | "cyberpunk" | "fantasy" | "glass";
             /**
-             * @description 参考图，建议使用完整 Data URL 格式（可选）
-             * @example data:image/png;base64,BASE64_IMAGE_STRING
+             * @description 可选的参考图片 URL
+             * @example https://qhstaticssl.kujiale.com/image/jpeg/1784775590613/image_to_3d_model.jpg
              */
             img?: string;
             /**
-             * @description Lux3D 版本，支持 v3.0-standard（默认）、v2.0-preview、v1.0-pro、G1。不传则默认使用 v3.0-standard
-             * @default v3.0-standard
-             * @example v3.0-standard
+             * @description 必填，仅支持 G1 和 G1-Turbo。
+             * @example G1
              * @enum {string}
              */
-            version?: "v3.0-standard" | "v2.0-preview" | "v1.0-pro" | "G1";
+            version: "G1" | "G1-Turbo";
             /**
-             * @description 可选。指定目标 Mesh 的生成面数，仅影响 Mesh 产物，不影响 3DGS 产物。v2.0-preview、v3.0-standard 和 G1 支持自定义面数，取值范围为 [10000, 500000]。v2.0-preview 和 v3.0-standard 未传此参数时默认使用 60000；G1 未传此参数时默认使用 200000；v1.0-pro 忽略此参数。
-             * @example 60000
+             * @description ZIP/GLB 模型的目标面数，范围 10000-300000，默认 200000；不影响 PLY。
+             * @example 200000
              */
             faceCount?: number;
             /**
-             * @description 统一输出格式列表。v2.0-preview 和 v3.0-standard 支持 zip、glb、usdz、obj_zip、fbx_zip；G1 支持 zip、glb、ply。
+             * @description 请求的输出格式。G1 固定返回 ZIP 和 GLB，请求包含 ply 时额外返回 PLY；G1-Turbo 返回指定格式，省略或传空数组时返回 ZIP。
              * @example [
-             *       "zip"
+             *       "zip",
+             *       "glb"
              *     ]
              */
-            outputFormat?: ("zip" | "glb" | "usdz" | "obj_zip" | "fbx_zip" | "ply")[];
+            outputFormat?: ("zip" | "glb" | "ply")[];
             /**
-             * @description 仅 G1 版本生成 Mesh 时生效。未传或 true 生成 G1 自带 PBR 材质；false 生成白模。
+             * @description 仅对 G1-Turbo 的 ZIP/GLB 输出生效：true（默认）生成带材质模型，false 生成白模；不决定输出格式。G1 及仅请求 PLY 时忽略。
              * @default true
              */
             enablePbr?: boolean;
             /**
-             * @description 仅 G1 版本生成 Mesh 且 enablePbr 未传或为 true 时生效，用于设置 G1 PBR 贴图尺寸，默认 2048。
-             * @default 2048
+             * @description 是否预测并应用模型尺寸，默认 true。
+             * @default true
              */
-            textureSize?: number;
+            aiPredictSize?: boolean;
         };
-        /** @description 模型材质重绘任务请求体。 */
+        /** @description 材质重绘请求体。 */
         MaterialTransferRequest: {
             /**
-             * @description 图片链接或 Base64，用于材质参考图
+             * @description 材质参考图片 URL
              * @example https://qhstaticssl.kujiale.com/image/png/1784776951878/material_transfer_input.png
              */
             img: string;
@@ -255,46 +263,64 @@ export interface components {
              */
             meshUrl: string;
             /**
-             * @description Lux3D 版本，支持 v3.0-standard（默认）、v2.0-preview、v1.0-pro。不传则默认使用 v3.0-standard
-             * @default v3.0-standard
+             * @description 必填，固定为 v3.0-standard。
              * @example v3.0-standard
              * @enum {string}
              */
-            version?: "v3.0-standard" | "v2.0-preview" | "v1.0-pro";
+            version: "v3.0-standard";
             /**
-             * @description 统一输出格式列表。v1.0-pro 仅支持 zip；v2.0-preview/v3.0-standard 支持 zip、glb、usdz、obj_zip、fbx_zip。G1 不支持材质重绘。
+             * @description 请求的输出格式：zip、glb、usdz、obj_zip 或 fbx_zip。
              * @example [
              *       "zip",
              *       "glb"
              *     ]
              */
             outputFormat?: ("zip" | "glb" | "usdz" | "obj_zip" | "fbx_zip")[];
-        };
-        /** @description 部件拆分任务请求体。 */
-        PartSplitRequest: {
+            /** @description 是否预测模型尺寸；为 true 时忽略 customSize。 */
+            aiPredictSize?: boolean;
             /**
-             * @description 待拆分的 GLB 模型公网 URL，通常来自 Lux3D 生成任务的 GLB 产物
+             * Format: float
+             * @description aiPredictSize 为 false 或未传时使用的目标高度（mm）；省略时保持原始尺寸。
+             */
+            customSize?: number;
+        };
+        /** @description 多格式导出任务请求体。 */
+        MultiFormatExportRequest: {
+            /**
+             * @description 模型公网 URL，支持 .zip 或 .glb。ZIP 输入必须来自 Lux3D 生成任务；GLB 输入时 outputFormat 不能为空。
              * @example https://qhstaticssl.kujiale.com/application/octetstream/1784776896628/model.glb
              */
-            glbUrl: string;
+            modelUrl: string;
+            /**
+             * @description 导出格式：usdz、obj_zip 或 fbx_zip。ZIP 输入省略或为空时仅返回 GLB；GLB 输入至少需要一个值。
+             * @example [
+             *       "usdz",
+             *       "obj_zip"
+             *     ]
+             */
+            outputFormat?: ("usdz" | "obj_zip" | "fbx_zip")[];
         };
         /** @description 任务创建响应体。 */
         TaskCreateResponse: {
+            /** @description 失败信息；成功时为 null。 */
+            f?: {
+                [key: string]: unknown;
+            } | null;
             /**
              * Format: int64
              * @description 返回 taskid
              * @example 1256173
              */
             d?: number | null;
-            /** @description 提示信息 */
+            /** @description 提示信息；成功时为空字符串 ""。 */
             m?: string | null;
-            /** @description 状态码 */
+            /** @description 状态码；成功时为 "0"，普通参数错误时为 "-1"，部分业务错误使用专用错误码。 */
             c?: string | null;
         };
         /** @description 任务输出项。 */
         TaskOutput: {
             /**
-             * @description 结果内容。通常为模型文件 URL；未请求的可选槽位可能返回 NOT_REQUESTED。G1 直接返回实际产物 URL。
+             * @description 结果内容。通常为模型文件 URL；未请求的可选槽位可能返回 NOT_REQUESTED。单图生四视图任务中为包含四张结果图片 URL 的 JSON 数组字符串。
              * @example https://cos.example.com/lux3d/xxx/result.zip
              */
             content?: string | null;
@@ -307,22 +333,31 @@ export interface components {
              * @example 1389513
              */
             taskId?: number;
-            /** @description 输出列表。图生3D/文生3D/材质重绘：v1.0-pro 返回单个 ZIP；v2.0-preview/v3.0-standard 返回五格式槽位（.zip、.glb、.usdz、_obj.zip、_fbx.zip）；G1 单格式返回对应产物，组合格式按 outputFormat 顺序返回多个产物 URL，GLB 是否带材质由 enablePbr 决定。未请求的经典版本可选格式返回 NOT_REQUESTED。部件拆分：输出单个 GLB 文件，内含拆分后的多个独立部件（不以多个文件返回）。 */
+            /**
+             * @description 任务业务标识。
+             * @example LUX_3D
+             */
+            bizId?: string;
+            /** @description 任务结果。G1 返回 ZIP、GLB 及按需返回的 PLY；G1-Turbo 返回指定格式，outputFormat 为空时返回 ZIP。材质重绘返回 ZIP、GLB 及请求的其他格式。单图生四视图返回一个包含四张图片 URL 的 JSON 数组字符串。 */
             outputs?: components["schemas"]["TaskOutput"][];
             /**
              * Format: int32
-             * @description 任务状态：0-初始化，1-进行中，3-成功，4-失败
+             * @description 任务状态：0-初始化，1-运行中，3-成功，4-失败，6-已取消
              * @example 3
              * @enum {integer}
              */
-            status?: 0 | 1 | 3 | 4;
+            status?: 0 | 1 | 3 | 4 | 6;
         };
         /** @description 任务查询响应体。 */
         TaskQueryResponse: {
+            /** @description 失败信息；成功时为 null。 */
+            f?: {
+                [key: string]: unknown;
+            } | null;
             d?: components["schemas"]["TaskQueryData"];
-            /** @description 提示信息 */
+            /** @description 提示信息；成功时为空字符串 ""。 */
             m?: string | null;
-            /** @description 状态码 */
+            /** @description 状态码；成功时为 "0"，普通参数错误时为 "-1"。 */
             c?: string | null;
         };
         TaskListItem: {
@@ -332,10 +367,10 @@ export interface components {
              */
             taskId?: number;
             /**
-             * @description 任务状态：0-初始化，1-运行中，3-成功，4-失败。
+             * @description 任务状态：0-初始化，1-运行中，3-成功，4-失败，6-已取消。
              * @enum {integer}
              */
-            status?: 0 | 1 | 3 | 4;
+            status?: 0 | 1 | 3 | 4 | 6;
             /**
              * Format: int64
              * @description 任务创建时间，Unix 毫秒时间戳
@@ -358,9 +393,13 @@ export interface components {
         };
         /**
          * @description 生成记录分页响应体。
-         *     注意：列表接口成功时 c 固定为 "0"、m 固定为 ""（空字符串），与创建/查询任务接口成功时 c/m 均为 null 的行为不同，请按 c === "0" 判断成功。
+         *     列表接口与创建、查询接口的成功响应一致：f 为 null、c 为 "0"、m 为 ""（空字符串）。请按 c === "0" 判断成功。
          */
         TaskListResponse: {
+            /** @description 失败信息；成功时为 null。 */
+            f?: {
+                [key: string]: unknown;
+            } | null;
             d?: components["schemas"]["TaskListData"];
             /** @description 提示信息。成功时为空字符串 ""。 */
             m?: string | null;
@@ -376,6 +415,58 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    createImageToFourViewTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description 单图生四视图任务请求体。 */
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "img": "https://qhstaticssl.kujiale.com/image/jpeg/1784775590613/image_to_3d_model.jpg"
+                 *     }
+                 */
+                "application/json": components["schemas"]["ImageToFourViewRequest"];
+            };
+        };
+        responses: {
+            /** @description 成功时返回任务 ID。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "f": null,
+                     *       "c": "0",
+                     *       "m": "",
+                     *       "d": 1256173
+                     *     }
+                     */
+                    "application/json": components["schemas"]["TaskCreateResponse"];
+                };
+            };
+            /** @description 未携带或无效的 Authorization，鉴权失败 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description 服务端内部错误 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     createImgTo3dTask: {
         parameters: {
             query?: never;
@@ -383,7 +474,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        /** @description 图生3D任务请求体。 */
+        /** @description 图生 3D 任务请求体。 */
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ImgTo3dRequest"];
@@ -426,7 +517,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        /** @description 文生3D任务请求体。 */
+        /** @description 文生 3D 任务请求体。 */
         requestBody: {
             content: {
                 "application/json": components["schemas"]["TextTo3dRequest"];
@@ -505,17 +596,17 @@ export interface operations {
             };
         };
     };
-    createPartSplitTask: {
+    createMultiFormatExportTask: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description 部件拆分任务请求体。 */
+        /** @description 多格式导出任务请求体。 */
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PartSplitRequest"];
+                "application/json": components["schemas"]["MultiFormatExportRequest"];
             };
         };
         responses: {
@@ -555,7 +646,7 @@ export interface operations {
                  * @description 任务ID
                  * @example 1389513
                  */
-                taskid: string;
+                taskid: number;
             };
             header?: never;
             path?: never;
@@ -599,8 +690,8 @@ export interface operations {
                 page?: number;
                 /** @description 每页数量，范围 1-100 */
                 pagesize?: number;
-                /** @description 任务状态：0-初始化，1-运行中，3-成功，4-失败。 */
-                status?: 0 | 1 | 3 | 4;
+                /** @description 任务状态：0-初始化，1-运行中，3-成功，4-失败，6-已取消。 */
+                status?: 0 | 1 | 3 | 4 | 6;
                 /** @description 创建时间起点，包含边界；Unix 毫秒时间戳 */
                 starttime?: number;
                 /** @description 创建时间终点，不包含边界；Unix 毫秒时间戳 */
@@ -612,7 +703,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description 成功返回当前账号的生成记录分页数据。 */
+            /** @description 返回生成记录分页数据。 */
             200: {
                 headers: {
                     [name: string]: unknown;

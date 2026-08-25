@@ -2,9 +2,7 @@
 """
 Minimal example: image-to-3D with Lux3D, poll until model URLs are ready.
 
-v3.0-standard / v2.0-preview: zip + glb + optional usdz/obj/fbx via output_format
-v1.0-pro:                     single ZIP
-G1:                           zip / glb / ply via output_format
+G1 / G1-Turbo: zip / glb / ply via output_format
 
 Usage: AHOLO_API_KEY=xxx python lux3d_img_to_3d.py ./chair.png
 """
@@ -23,7 +21,7 @@ region = os.environ.get("AHOLO_REGION", "cn")
 lux3d = create_lux3d_client(AholoClientConfig(region=region))
 
 print(f"Creating img-to-3D task from {file_path} ...")
-task_id = lux3d.img_to_3d.create_from_file(file_path)
+task_id = lux3d.img_to_3d.create_from_file(file_path, version="G1")
 print(f"taskId={task_id}, polling...")
 
 t0 = time.monotonic()
