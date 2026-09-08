@@ -1,6 +1,7 @@
 export { createLux3dClient, Lux3dClient } from './lux3d-client.js';
 export { ImageToFourViewResource } from './resources/image-to-four-view.js';
 export { ImgTo3dResource } from './resources/img-to-3d.js';
+export { MultimodalToImageResource } from './resources/multimodal-to-image.js';
 export { MaterialTransferResource } from './resources/material-transfer.js';
 export { MultiFormatExportResource } from './resources/multi-format-export.js';
 export { TasksResource } from './resources/tasks.js';
@@ -13,6 +14,8 @@ export {
   LUX3D_STATUS_SUCCESS,
   type ImageToFourViewRequest,
   type ImgTo3dRequest,
+  type Lux3dTaskListStatus,
+  type MultimodalToImageRequest,
   type Lux3dOutputFormat,
   type Lux3dRequestOptions,
   type Lux3dStyle,

@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Optional;
 
-/** Parameters for creating a multimodal four-view task. */
+/** Parameters for creating a multimodal single-image generation task. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class ImageToFourViewCreateParams {
+public final class MultimodalToImageCreateParams {
     @JsonProperty("img") private final String img;
     @JsonProperty("prompt") private final String prompt;
 
-    private ImageToFourViewCreateParams(Builder builder) {
+    private MultimodalToImageCreateParams(Builder builder) {
         this.img = builder.img;
         this.prompt = builder.prompt;
     }
@@ -25,7 +25,7 @@ public final class ImageToFourViewCreateParams {
         private Builder() {}
         public Builder img(String img) { this.img = img; return this; }
         public Builder prompt(String prompt) { this.prompt = prompt; return this; }
-        public ImageToFourViewCreateParams build() {
+        public MultimodalToImageCreateParams build() {
             if (img != null && img.trim().isEmpty()) {
                 throw new IllegalArgumentException("img must not be empty");
             }
@@ -35,7 +35,7 @@ public final class ImageToFourViewCreateParams {
             if (img == null && prompt == null) {
                 throw new IllegalArgumentException("img or prompt is required");
             }
-            return new ImageToFourViewCreateParams(this);
+            return new MultimodalToImageCreateParams(this);
         }
     }
 }

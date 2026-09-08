@@ -12,8 +12,13 @@ if TYPE_CHECKING:
     from manycore.aholo_sdk_core import AholoGatewayClient
 
 
+_OUTPUT_FORMATS = frozenset({"usdz", "obj_zip", "fbx_zip", "stl", "3mf"})
+
+
 def _export_body(*, model_url: str,
                  output_format: Optional[Sequence[MultiFormatExportOutputFormat]] = None) -> dict:
+    if output_format is not None and any(fmt not in _OUTPUT_FORMATS for fmt in output_format):
+        raise ValueError("output_format supports usdz, obj_zip, fbx_zip, stl, and 3mf")
     if urlsplit(model_url).path.lower().endswith(".glb") and not output_format:
         raise ValueError("output_format is required for GLB input")
     body: dict = {"modelUrl": model_url}

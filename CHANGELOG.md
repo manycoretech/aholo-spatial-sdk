@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Lux3D 1.7.0] - 2026-09-08
+
+### Added
+
+- Multimodal-to-image resource (`multimodalToImage` / `multimodal_to_image`) across TypeScript, Java, and Python (sync/async), including `createFromFile` / `create_from_file`.
+- Multi-format export formats `stl` and `3mf`.
+
+### Changed
+
+- Bumped all three Lux3D SDK packages to **1.7.0**.
+- Image-to-four-view now accepts `img` and/or `prompt` (prompt-only and image+prompt are valid).
+- Task list `status` filter is `0`, `1`, `3`, `4`; result items may still have canceled status `6`.
+
+### Breaking Changes
+
+- Java `ImageToFourViewCreateParams.img()` is now `Optional<String>`; `prompt` is optional and at least one of img/prompt is required.
+- Task list filter no longer accepts status `6`.
+
 ## [Lux3D 1.6.0] - 2026-08-25
 
 ### Added
@@ -124,6 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Repository initialized.
 
+[lux3d-1.7.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.6.0...lux3d/v1.7.0
 [lux3d-1.6.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.5.0...lux3d/v1.6.0
 [lux3d-1.5.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.4.0...lux3d/v1.5.0
 [lux3d-1.4.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.3.0...lux3d/v1.4.0

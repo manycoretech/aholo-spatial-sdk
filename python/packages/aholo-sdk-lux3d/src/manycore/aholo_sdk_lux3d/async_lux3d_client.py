@@ -7,6 +7,7 @@ from manycore.aholo_sdk_core import AholoClientConfig, create_async_gateway_clie
 from .resources.image_to_four_view import AsyncImageToFourViewResource
 from .resources.img_to_3d import AsyncImgTo3dResource
 from .resources.material_transfer import AsyncMaterialTransferResource
+from .resources.multimodal_to_image import AsyncMultimodalToImageResource
 from .resources.multi_format_export import AsyncMultiFormatExportResource
 from .resources.tasks import AsyncTasksResource
 from .resources.text_to_3d import AsyncTextTo3dResource
@@ -19,6 +20,7 @@ class AsyncLux3dClient:
         gateway = create_async_gateway_client(cfg)
         region: str = cfg.region or "cn"
         self._gateway = gateway
+        self.multimodal_to_image = AsyncMultimodalToImageResource(gateway, region)
         self.image_to_four_view = AsyncImageToFourViewResource(gateway, region)
         self.img_to_3d = AsyncImgTo3dResource(gateway, region)
         self.text_to_3d = AsyncTextTo3dResource(gateway, region)

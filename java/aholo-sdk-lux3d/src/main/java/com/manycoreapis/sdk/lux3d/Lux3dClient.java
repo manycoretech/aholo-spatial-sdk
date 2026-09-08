@@ -5,12 +5,14 @@ import com.manycoreapis.sdk.core.AholoGatewayClient;
 import com.manycoreapis.sdk.lux3d.resources.ImageToFourViewResource;
 import com.manycoreapis.sdk.lux3d.resources.ImgTo3dResource;
 import com.manycoreapis.sdk.lux3d.resources.MaterialTransferResource;
+import com.manycoreapis.sdk.lux3d.resources.MultimodalToImageResource;
 import com.manycoreapis.sdk.lux3d.resources.MultiFormatExportResource;
 import com.manycoreapis.sdk.lux3d.resources.TasksResource;
 import com.manycoreapis.sdk.lux3d.resources.TextTo3dResource;
 
 /** Aholo Lux3D API client. */
 public class Lux3dClient {
+    private final MultimodalToImageResource multimodalToImage;
     private final ImageToFourViewResource imageToFourView;
     private final ImgTo3dResource imgTo3d;
     private final TextTo3dResource textTo3d;
@@ -22,6 +24,7 @@ public class Lux3dClient {
         AholoClientConfig cfg = config == null ? AholoClientConfig.defaults() : config;
         AholoGatewayClient gateway = new AholoGatewayClient(cfg);
         String prefix = lux3dPathPrefix(cfg);
+        this.multimodalToImage = new MultimodalToImageResource(gateway, prefix);
         this.imageToFourView = new ImageToFourViewResource(gateway, prefix);
         this.imgTo3d = new ImgTo3dResource(gateway, prefix);
         this.textTo3d = new TextTo3dResource(gateway, prefix);
@@ -31,6 +34,7 @@ public class Lux3dClient {
     }
 
     public static Lux3dClient create(AholoClientConfig config) { return new Lux3dClient(config); }
+    public MultimodalToImageResource multimodalToImage() { return multimodalToImage; }
     public ImageToFourViewResource imageToFourView() { return imageToFourView; }
     public ImgTo3dResource imgTo3d() { return imgTo3d; }
     public TextTo3dResource textTo3d() { return textTo3d; }

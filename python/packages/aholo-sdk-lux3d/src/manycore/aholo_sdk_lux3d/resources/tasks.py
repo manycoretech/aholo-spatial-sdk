@@ -66,8 +66,8 @@ class TasksResource:
     ) -> TaskPagedList:
         """GET /generate/task/list. Omitted filters are not sent."""
         query: dict = {}
-        if status is not None and status not in (0, 1, 3, 4, 6):
-            raise ValueError("status must be one of 0, 1, 3, 4, 6")
+        if status is not None and status not in (0, 1, 3, 4):
+            raise ValueError("status must be one of 0, 1, 3, 4")
         if page is not None:
             query["page"] = page
         if page_size is not None:
@@ -140,8 +140,8 @@ class AsyncTasksResource:
         end_time: Optional[int] = None,
     ) -> TaskPagedList:
         query: dict = {}
-        if status is not None and status not in (0, 1, 3, 4, 6):
-            raise ValueError("status must be one of 0, 1, 3, 4, 6")
+        if status is not None and status not in (0, 1, 3, 4):
+            raise ValueError("status must be one of 0, 1, 3, 4")
         if page is not None:
             query["page"] = page
         if page_size is not None:
