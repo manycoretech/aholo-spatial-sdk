@@ -3,13 +3,14 @@ from .lux3d_client import Lux3dClient, create_lux3d_client, file_to_data_url
 from .resources.image_to_four_view import AsyncImageToFourViewResource, ImageToFourViewResource
 from .resources.img_to_3d import AsyncImgTo3dResource, ImgTo3dResource
 from .resources.material_transfer import AsyncMaterialTransferResource, MaterialTransferResource
+from .resources.multimodal_to_image import AsyncMultimodalToImageResource, MultimodalToImageResource
 from .resources.multi_format_export import AsyncMultiFormatExportResource, MultiFormatExportResource
 from .resources.tasks import AsyncTasksResource, TasksResource
 from .resources.text_to_3d import AsyncTextTo3dResource, TextTo3dResource
 from .types import (
     LUX3D_OUTPUT_NOT_REQUESTED, LUX3D_STATUS_CANCELED, LUX3D_STATUS_FAILED,
-    LUX3D_STATUS_SUCCESS, Lux3dOutputFormat, Lux3dStyle, Lux3dTaskResult,
-    Lux3dTaskStatus, Lux3dVersion, MaterialTransferOutputFormat,
+    LUX3D_STATUS_SUCCESS, Lux3dOutputFormat, Lux3dStyle, Lux3dTaskListStatus,
+    Lux3dTaskResult, Lux3dTaskStatus, Lux3dVersion, MaterialTransferOutputFormat,
     MaterialTransferVersion, MultiFormatExportOutputFormat, TaskListItem,
     TaskOutput, TaskPagedList,
 )

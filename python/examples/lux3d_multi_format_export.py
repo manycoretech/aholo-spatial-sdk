@@ -10,5 +10,5 @@ if len(sys.argv) < 2:
 
 lux3d = create_lux3d_client(AholoClientConfig(region=os.environ.get("AHOLO_REGION", "cn")))
 task_id = lux3d.multi_format_export.create(
-    model_url=sys.argv[1], output_format=["usdz", "obj_zip"])
+    model_url=sys.argv[1], output_format=["usdz", "obj_zip", "stl", "3mf"])
 print(lux3d.tasks.wait_for(task_id))

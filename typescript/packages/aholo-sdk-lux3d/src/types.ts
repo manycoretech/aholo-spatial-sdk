@@ -7,7 +7,13 @@ type GeneratedImgTo3dRequest       = components['schemas']['ImgTo3dRequest'];
 type ImgTo3dRequestOptions         = Omit<GeneratedImgTo3dRequest, 'img' | 'imgs'>;
 export type ImgTo3dRequest         = ImgTo3dRequestOptions &
   ({ img: string; imgs?: never } | { img?: never; imgs: string[] });
-export type ImageToFourViewRequest = components['schemas']['ImageToFourViewRequest'];
+// Generated anyOf schemas collapse to `| unknown`; keep img|prompt as a real union.
+export type MultimodalToImageRequest =
+  | { img: string; prompt?: string }
+  | { img?: string; prompt: string };
+export type ImageToFourViewRequest =
+  | { img: string; prompt?: string }
+  | { img?: string; prompt: string };
 export type TextTo3dRequest         = components['schemas']['TextTo3dRequest'];
 export type MaterialTransferRequest = components['schemas']['MaterialTransferRequest'];
 export type MultiFormatExportRequest = components['schemas']['MultiFormatExportRequest'];
@@ -29,6 +35,8 @@ export type MaterialTransferOutputFormat = NonNullable<MaterialTransferRequest['
 export type MultiFormatExportOutputFormat = NonNullable<MultiFormatExportRequest['outputFormat']>[number];
 /** 0 init, 1 running, 3 success, 4 failed, 6 canceled */
 export type Lux3dTaskStatus   = NonNullable<TaskQueryData['status']>;
+/** List-filter statuses. Result items may still have status 6 (canceled). */
+export type Lux3dTaskListStatus = 0 | 1 | 3 | 4;
 
 export const LUX3D_STATUS_SUCCESS = 3 as const;
 export const LUX3D_STATUS_FAILED  = 4 as const;
@@ -46,7 +54,7 @@ export interface Lux3dTaskResult {
 export interface TaskListParams {
   page?: number;
   pageSize?: number;
-  status?: Lux3dTaskStatus;
+  status?: Lux3dTaskListStatus;
   startTime?: number;
   endTime?: number;
 }

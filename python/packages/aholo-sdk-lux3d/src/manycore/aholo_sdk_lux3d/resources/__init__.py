@@ -1,6 +1,7 @@
 from .image_to_four_view import AsyncImageToFourViewResource, ImageToFourViewResource
 from .img_to_3d import AsyncImgTo3dResource, ImgTo3dResource
 from .material_transfer import AsyncMaterialTransferResource, MaterialTransferResource
+from .multimodal_to_image import AsyncMultimodalToImageResource, MultimodalToImageResource
 from .multi_format_export import AsyncMultiFormatExportResource, MultiFormatExportResource
 from .tasks import AsyncTasksResource, TasksResource
 from .text_to_3d import AsyncTextTo3dResource, TextTo3dResource

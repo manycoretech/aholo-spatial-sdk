@@ -12,7 +12,7 @@ public final class Lux3dMultiFormatExport {
         if (args.length < 1) throw new IllegalArgumentException("Usage: Lux3dMultiFormatExport <model-url>");
         Lux3dClient lux3d = Lux3dClient.create(AholoClientConfig.defaults());
         long taskId = lux3d.multiFormatExport().create(MultiFormatExportCreateParams.builder()
-                .modelUrl(args[0]).outputFormat(Arrays.asList("usdz", "obj_zip")).build());
+                .modelUrl(args[0]).outputFormat(Arrays.asList("usdz", "obj_zip", "stl", "3mf")).build());
         System.out.println(lux3d.tasks().waitFor(taskId));
     }
 }

@@ -18,12 +18,25 @@ const lux3d = createLux3dClient({ region: 'com' }); // or 'cn'
 
 Set `AHOLO_API_KEY`, or pass `apiKey` in the client config.
 
+## Multimodal to image
+
+Create a single image from a prompt, a reference image, or both:
+
+```typescript
+await lux3d.multimodalToImage.create({ prompt: 'A light wood dining chair on a white background' });
+await lux3d.multimodalToImage.createFromFile('./object.jpg', { prompt: 'Keep the viewpoint' });
+```
+
 ## Image to four views
+
+`img` and/or `prompt` are accepted. Prompt-only generation is valid:
 
 ```typescript
 const taskId = await lux3d.imageToFourView.create({
   img: 'https://example.com/object.jpg',
 });
+await lux3d.imageToFourView.create({ prompt: 'A light wood dining chair' });
+await lux3d.imageToFourView.createFromFile('./object.jpg');
 ```
 
 ## Image to 3D
@@ -77,7 +90,7 @@ await lux3d.materialTransfer.create({
 ```typescript
 await lux3d.multiFormatExport.create({
   modelUrl: 'https://example.com/model.glb',
-  outputFormat: ['usdz', 'obj_zip', 'fbx_zip'],
+  outputFormat: ['usdz', 'obj_zip', 'fbx_zip', 'stl', '3mf'],
 });
 ```
 
@@ -85,11 +98,11 @@ await lux3d.multiFormatExport.create({
 
 ```typescript
 const result = await lux3d.tasks.retrieve(taskId);
-const page = await lux3d.tasks.list({ status: 6 });
+const page = await lux3d.tasks.list({ status: 3 });
 const completed = await lux3d.tasks.waitFor(taskId);
 ```
 
-Statuses are `0` init, `1` running, `3` success, `4` failed, and `6` canceled. Polling rejects on failed or canceled tasks.
+List filters accept `0` init, `1` running, `3` success, and `4` failed. Result items may still have `6` canceled. Polling rejects on failed or canceled tasks.
 
 ## License
 

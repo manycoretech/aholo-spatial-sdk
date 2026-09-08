@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/lux3d/v1/generate/multimodal-to-image/task/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 创建多模态单图生成任务
+         * @description 根据图片、文字提示词或图文组合创建异步单图生成任务，img 和 prompt 至少提供一个。生成前会以 photorealistic 风格重写和扩展提示词：纯图片模式使用内置重生成要求，根据参考图重新生成并保留主体造型、结构、比例、视角和主要视觉特征，不会直接透传原图；纯文字模式根据提示词生成图片；图文组合模式会按提示词修改参考图。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和唯一结果图片 URL。
+         */
+        post: operations["createMultimodalToImageTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/lux3d/v1/generate/image-to-four-view/task/create": {
         parameters: {
             query?: never;
@@ -14,8 +34,12 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 创建单图生四视图任务
-         * @description 根据一张图片创建异步四视图任务。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
+         * 创建多模态四视图任务
+         * @description 根据图片、文字提示词或图文组合创建异步四视图任务，img 和 prompt 至少提供一个：
+         *     - 纯图片：原图在源图阶段直接透传，不调用单图生成/重绘；随后进入质量预检，仅在预检不通过或异常时执行 Delight，再补齐四视图。
+         *     - 纯文字：系统自动补充单物体、主体完整居中、纯白背景、不得生成四宫格/多视图拼图等约束，先生成一张规范源图，再进入质量预检和四视图补齐。
+         *     - 图文组合：系统按相同约束重绘参考图，并要求保留主体造型、结构、比例和视角，再进入质量预检和四视图补齐。
+         *     三种模式在质量预检通过时均会跳过 Delight。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。任务成功时 outputs 固定只有一个输出项，其 content 为四个图片 URL 组成的 JSON 数组字符串，顺序为 FRONT_THREE_QUARTER、OPPOSITE_THREE_QUARTER、SIDE、BACK。
          */
         post: operations["createImageToFourViewTask"];
         delete?: never;
@@ -35,7 +59,7 @@ export interface paths {
         put?: never;
         /**
          * 创建图生 3D 任务
-         * @description 根据一张或多张图片创建异步 3D 生成任务。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
+         * @description 根据一张或多张图片创建异步 3D 生成任务，支持 G1 和 G1-Turbo。省略 version 时使用服务端配置；为避免默认配置调整影响调用，建议始终显式传入版本。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
          */
         post: operations["createImgTo3dTask"];
         delete?: never;
@@ -55,7 +79,7 @@ export interface paths {
         put?: never;
         /**
          * 创建文生 3D 任务
-         * @description 根据文本和一张可选参考图片创建异步 3D 生成任务。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
+         * @description 根据文本和一张可选参考图片创建异步 3D 生成任务，支持 G1 和 G1-Turbo。省略 version 时使用服务端配置；为避免默认配置调整影响调用，建议始终显式传入版本。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
          */
         post: operations["createTextTo3dTask"];
         delete?: never;
@@ -75,7 +99,7 @@ export interface paths {
         put?: never;
         /**
          * 创建模型材质重绘任务
-         * @description 根据材质参考图片和 GLB 模型创建异步材质重绘任务。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
+         * @description 根据材质参考图片和 GLB 模型创建异步材质重绘任务，当前 version 固定传 v3.0-standard。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
          */
         post: operations["createMaterialTransferTask"];
         delete?: never;
@@ -95,7 +119,15 @@ export interface paths {
         put?: never;
         /**
          * 创建多格式导出任务
-         * @description 根据 ZIP 或 GLB 模型 URL 创建异步格式导出任务。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
+         * @description 根据 ZIP 或 GLB 模型 URL 创建异步格式导出任务。GLB 为基础结果：ZIP 输入会默认导出 GLB，GLB 输入会在结果中回传输入地址；`outputFormat` 仅用于选择可选格式 USDZ、OBJ ZIP、FBX ZIP、STL 和 3MF。请求成功后返回任务 ID（taskid），可通过任务查询接口获取状态和结果。
+         *
+         *     格式说明：
+         *     - GLB：二进制 glTF 模型格式，便于网页、实时渲染和跨平台预览；GLB 会自动返回或回传，不需要也不能通过 `outputFormat` 请求。
+         *     - USDZ：Apple 生态常用的 AR 模型格式，适用于 iOS、iPadOS 和 Quick Look 等 AR 预览场景。
+         *     - OBJ ZIP：包含 OBJ、MTL 和贴图文件的压缩包，兼容常见 3D 软件和 DCC 工具。
+         *     - FBX ZIP：包含 FBX 模型及贴图资源的压缩包，适用于 Maya、3ds Max、Blender 等主流 DCC 工作流。
+         *     - STL：面向 3D 打印和几何交换的网格格式，不包含材质和贴图信息。
+         *     - 3MF：面向 3D 打印的 3D Manufacturing Format，适合需要制造/打印格式交付的场景。
          */
         post: operations["createMultiFormatExportTask"];
         delete?: never;
@@ -148,23 +180,41 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description 单图生四视图请求体，仅需提供一张输入图片。 */
-        ImageToFourViewRequest: {
+        /** @description 多模态单图生成请求体，img 和 prompt 至少提供一个，支持纯图片、纯文字或图文组合输入；纯图片会重新生成，不会直接透传原图。 */
+        MultimodalToImageRequest: {
             /**
-             * @description 单张图片 URL
-             * @example https://qhstaticssl.kujiale.com/image/jpeg/1784775590613/image_to_3d_model.jpg
-             */
-            img: string;
-        };
-        /** @description 图生 3D 请求体，img 与 imgs 必须二选一。 */
-        ImgTo3dRequest: {
-            /**
-             * @description 单张图片 URL
+             * @description 单张参考图片 URL，可单独使用或与 prompt 组合。如需上传本地文件，请先调用 [Asset 文件上传接口](https://labs.aholo3d.cn/api-docs/api-reference#tag/asset)，再将返回的 URL 填入此字段。
              * @example https://qhstaticssl.kujiale.com/image/jpeg/1784775590613/image_to_3d_model.jpg
              */
             img?: string;
             /**
-             * @description 1-32 张图片 URL。保留输入顺序，第一张图作为主要参考；与 img 互斥。
+             * @description 图片生成或重生成提示词，可单独使用或与 img 组合
+             * @example 把椅子改成浅色原木材质，保持造型和视角
+             */
+            prompt?: string;
+        } | unknown | unknown;
+        /** @description 多模态四视图请求体，img 和 prompt 至少提供一个，支持纯图片、纯文字或图文组合输入。非空 prompt 会自动附加适合后续补齐多视角的规范源图约束。 */
+        ImageToFourViewRequest: {
+            /**
+             * @description 单张图片 URL。如需上传本地文件，请先调用 [Asset 文件上传接口](https://labs.aholo3d.cn/api-docs/api-reference#tag/asset)，再将返回的 URL 填入此字段。
+             * @example https://qhstaticssl.kujiale.com/image/jpeg/1784775590613/image_to_3d_model.jpg
+             */
+            img?: string;
+            /**
+             * @description 文字提示词，可单独用于纯文字生成四视图，也可与 img 组合使用
+             * @example 一把现代简约浅色原木餐椅，纯白背景
+             */
+            prompt?: string;
+        } | unknown | unknown;
+        /** @description 图生 3D 请求体，支持 G1 和 G1-Turbo，可使用 img 单图或 imgs 多图；img 与 imgs 必须二选一。 */
+        ImgTo3dRequest: {
+            /**
+             * @description 单张图片 URL，G1 和 G1-Turbo 均支持。如需上传本地文件，请先调用 [Asset 文件上传接口](https://labs.aholo3d.cn/api-docs/api-reference#tag/asset)，再将返回的 URL 填入此字段。
+             * @example https://qhstaticssl.kujiale.com/image/jpeg/1784775590613/image_to_3d_model.jpg
+             */
+            img?: string;
+            /**
+             * @description G1 / G1-Turbo 的 1-32 张图片 URL。保留输入顺序，第一张图作为主要参考；与 img 互斥。使用 imgs 时必须显式传入 version=G1 或 version=G1-Turbo。如需上传本地文件，请先调用 [Asset 文件上传接口](https://labs.aholo3d.cn/api-docs/api-reference#tag/asset)，再将返回的 URL 填入此字段。
              * @example [
              *       "https://qhstaticssl.kujiale.com/image/png/1784775590866/multiview_input_1.png",
              *       "https://qhstaticssl.kujiale.com/image/png/1784775591151/multiview_input_2.png"
@@ -172,13 +222,13 @@ export interface components {
              */
             imgs?: string[];
             /**
-             * @description 必填，仅支持 G1 和 G1-Turbo。
+             * @description 生成版本，支持 G1 和 G1-Turbo。省略时使用服务端配置；为避免默认配置调整影响调用，建议始终显式传入。
              * @example G1
              * @enum {string}
              */
-            version: "G1" | "G1-Turbo";
+            version?: "G1" | "G1-Turbo";
             /**
-             * @description ZIP/GLB 模型的目标面数，范围 10000-300000，默认 200000；不影响 PLY。
+             * @description 目标 Mesh 面数，不影响 3DGS/PLY。G1 和 G1-Turbo 的取值范围为 10000-300000，默认 200000。
              * @example 200000
              */
             faceCount?: number;
@@ -191,17 +241,17 @@ export interface components {
              */
             outputFormat?: ("zip" | "glb" | "ply")[];
             /**
-             * @description 仅对 G1-Turbo 的 ZIP/GLB 输出生效：true（默认）生成带材质模型，false 生成白模；不决定输出格式。G1 及仅请求 PLY 时忽略。
+             * @description 仅对 G1-Turbo 包含 Mesh 的请求生效：true 或省略时生成 PBR Mesh，false 生成白模；不决定输出格式。G1 及仅请求 PLY 时忽略。
              * @default true
              */
             enablePbr?: boolean;
-            /**
-             * @description 是否预测并应用模型尺寸，默认 true。
-             * @default true
-             */
+            /** @description 省略或 true 会启用 AI 尺寸预测与缩放，false 关闭。 */
             aiPredictSize?: boolean;
-        } & (unknown | unknown);
-        /** @description 文生 3D 请求体，可选提供一张 img 参考图。 */
+        } & (unknown | {
+            /** @enum {string} */
+            version: "G1" | "G1-Turbo";
+        });
+        /** @description 文生 3D 请求体，支持 G1 和 G1-Turbo，可选提供一张 img 参考图。 */
         TextTo3dRequest: {
             /**
              * @description 文本提示词
@@ -216,18 +266,18 @@ export interface components {
              */
             style?: "photorealistic" | "cartoon" | "anime" | "hand_painted" | "cyberpunk" | "fantasy" | "glass";
             /**
-             * @description 可选的参考图片 URL
+             * @description 可选的参考图片 URL。如需上传本地文件，请先调用 [Asset 文件上传接口](https://labs.aholo3d.cn/api-docs/api-reference#tag/asset)，再将返回的 URL 填入此字段。
              * @example https://qhstaticssl.kujiale.com/image/jpeg/1784775590613/image_to_3d_model.jpg
              */
             img?: string;
             /**
-             * @description 必填，仅支持 G1 和 G1-Turbo。
+             * @description 生成版本，支持 G1 和 G1-Turbo。省略时使用服务端配置；为避免默认配置调整影响调用，建议始终显式传入。
              * @example G1
              * @enum {string}
              */
-            version: "G1" | "G1-Turbo";
+            version?: "G1" | "G1-Turbo";
             /**
-             * @description ZIP/GLB 模型的目标面数，范围 10000-300000，默认 200000；不影响 PLY。
+             * @description 目标 Mesh 面数，不影响 3DGS/PLY。G1 和 G1-Turbo 的取值范围为 10000-300000，默认 200000。
              * @example 200000
              */
             faceCount?: number;
@@ -240,30 +290,27 @@ export interface components {
              */
             outputFormat?: ("zip" | "glb" | "ply")[];
             /**
-             * @description 仅对 G1-Turbo 的 ZIP/GLB 输出生效：true（默认）生成带材质模型，false 生成白模；不决定输出格式。G1 及仅请求 PLY 时忽略。
+             * @description 仅对 G1-Turbo 包含 Mesh 的请求生效：true 或省略时生成 PBR Mesh，false 生成白模；不决定输出格式。G1 及仅请求 PLY 时忽略。
              * @default true
              */
             enablePbr?: boolean;
-            /**
-             * @description 是否预测并应用模型尺寸，默认 true。
-             * @default true
-             */
+            /** @description 省略或 true 会启用 AI 尺寸预测与缩放，false 关闭。 */
             aiPredictSize?: boolean;
         };
-        /** @description 材质重绘请求体。 */
+        /** @description 材质重绘请求体，version 当前固定为 v3.0-standard。 */
         MaterialTransferRequest: {
             /**
-             * @description 材质参考图片 URL
+             * @description 材质参考图片 URL。如需上传本地文件，请先调用 [Asset 文件上传接口](https://labs.aholo3d.cn/api-docs/api-reference#tag/asset)，再将返回的 URL 填入此字段。
              * @example https://qhstaticssl.kujiale.com/image/png/1784776951878/material_transfer_input.png
              */
             img: string;
             /**
-             * @description 模型 GLB 文件地址
+             * @description 模型 GLB 文件 URL。如需上传本地文件，请先调用 [Asset 文件上传接口](https://labs.aholo3d.cn/api-docs/api-reference#tag/asset)，再将返回的 URL 填入此字段。
              * @example https://qhstaticssl.kujiale.com/application/octetstream/1784776896628/material_transfer_model.glb
              */
             meshUrl: string;
             /**
-             * @description 必填，固定为 v3.0-standard。
+             * @description 必填，当前固定传 v3.0-standard。
              * @example v3.0-standard
              * @enum {string}
              */
@@ -287,18 +334,26 @@ export interface components {
         /** @description 多格式导出任务请求体。 */
         MultiFormatExportRequest: {
             /**
-             * @description 模型公网 URL，支持 .zip 或 .glb。ZIP 输入必须来自 Lux3D 生成任务；GLB 输入时 outputFormat 不能为空。
+             * @description 模型公网 URL，支持 .zip 或 .glb。ZIP 输入必须来自 Lux3D 生成任务；GLB 输入时 outputFormat 不能为空。如需上传本地文件，请先调用 [Asset 文件上传接口](https://labs.aholo3d.cn/api-docs/api-reference#tag/asset)，再将返回的 URL 填入此字段；其中 ZIP 仍必须是 Lux3D 生成任务产物。
              * @example https://qhstaticssl.kujiale.com/application/octetstream/1784776896628/model.glb
              */
             modelUrl: string;
             /**
-             * @description 导出格式：usdz、obj_zip 或 fbx_zip。ZIP 输入省略或为空时仅返回 GLB；GLB 输入至少需要一个值。
+             * @description 可选导出格式，支持单项或组合：usdz、obj_zip、fbx_zip、stl、3mf。GLB 为基础结果，会自动返回或回传，不需要也不能通过 outputFormat 请求。
+             *     - usdz：Apple 生态常用的 AR 模型格式，适用于 iOS、iPadOS 和 Quick Look 等 AR 预览场景。
+             *     - obj_zip：包含 OBJ、MTL 和贴图文件的压缩包，兼容常见 3D 软件和 DCC 工具。
+             *     - fbx_zip：包含 FBX 模型及贴图资源的压缩包，适用于 Maya、3ds Max、Blender 等主流 DCC 工作流。
+             *     - stl：面向 3D 打印和几何交换的网格格式，不包含材质和贴图信息。
+             *     - 3mf：面向 3D 打印的 3D Manufacturing Format，适合需要制造/打印格式交付的场景。
+             *     ZIP 输入省略或为空时仅返回 GLB；GLB 输入至少需要一个值。
              * @example [
              *       "usdz",
-             *       "obj_zip"
+             *       "obj_zip",
+             *       "stl",
+             *       "3mf"
              *     ]
              */
-            outputFormat?: ("usdz" | "obj_zip" | "fbx_zip")[];
+            outputFormat?: ("usdz" | "obj_zip" | "fbx_zip" | "stl" | "3mf")[];
         };
         /** @description 任务创建响应体。 */
         TaskCreateResponse: {
@@ -320,7 +375,7 @@ export interface components {
         /** @description 任务输出项。 */
         TaskOutput: {
             /**
-             * @description 结果内容。通常为模型文件 URL；未请求的可选槽位可能返回 NOT_REQUESTED。单图生四视图任务中为包含四张结果图片 URL 的 JSON 数组字符串。
+             * @description 结果内容。通常为模型文件 URL；多模态单图生成任务中为单张结果图片 URL；未请求的可选槽位可能返回 NOT_REQUESTED。多模态四视图任务中为包含四张结果图片 URL 的 JSON 数组字符串，固定顺序为 FRONT_THREE_QUARTER、OPPOSITE_THREE_QUARTER、SIDE、BACK。
              * @example https://cos.example.com/lux3d/xxx/result.zip
              */
             content?: string | null;
@@ -338,7 +393,7 @@ export interface components {
              * @example LUX_3D
              */
             bizId?: string;
-            /** @description 任务结果。G1 返回 ZIP、GLB 及按需返回的 PLY；G1-Turbo 返回指定格式，outputFormat 为空时返回 ZIP。材质重绘返回 ZIP、GLB 及请求的其他格式。单图生四视图返回一个包含四张图片 URL 的 JSON 数组字符串。 */
+            /** @description 任务结果。运行中的任务可能返回已经生成的部分产物。多模态单图生成固定返回一个结果图片 URL。材质重绘按 ZIP、GLB、USDZ、OBJ ZIP、FBX ZIP 顺序返回，未请求的可选格式可能返回 NOT_REQUESTED。G1 返回 ZIP、GLB 及按需返回的 PLY；G1-Turbo 返回指定格式，outputFormat 为空时返回 ZIP。多格式导出固定按 zipUrl、glbUrl、usdzUrl、objZipUrl、fbxZipUrl、stlUrl、threeMfUrl 顺序返回；ZIP 输入的 glbUrl 是默认导出结果，GLB 输入的 glbUrl 回传输入地址。多模态四视图固定返回一个 JSON 数组字符串，四张图片顺序为 FRONT_THREE_QUARTER、OPPOSITE_THREE_QUARTER、SIDE、BACK。 */
             outputs?: components["schemas"]["TaskOutput"][];
             /**
              * Format: int32
@@ -415,6 +470,49 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    createMultimodalToImageTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description 多模态单图生成请求体，img 和 prompt 至少提供一个。 */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MultimodalToImageRequest"];
+            };
+        };
+        responses: {
+            /** @description 成功时返回任务 ID。 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskCreateResponse"];
+                };
+            };
+            /** @description 未携带或无效的 Authorization，鉴权失败 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskCreateResponse"];
+                };
+            };
+            /** @description 服务端内部错误 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskCreateResponse"];
+                };
+            };
+        };
+    };
     createImageToFourViewTask: {
         parameters: {
             query?: never;
@@ -422,14 +520,9 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        /** @description 单图生四视图任务请求体。 */
+        /** @description 多模态四视图任务请求体。 */
         requestBody: {
             content: {
-                /**
-                 * @example {
-                 *       "img": "https://qhstaticssl.kujiale.com/image/jpeg/1784775590613/image_to_3d_model.jpg"
-                 *     }
-                 */
                 "application/json": components["schemas"]["ImageToFourViewRequest"];
             };
         };
@@ -440,14 +533,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    /**
-                     * @example {
-                     *       "f": null,
-                     *       "c": "0",
-                     *       "m": "",
-                     *       "d": 1256173
-                     *     }
-                     */
                     "application/json": components["schemas"]["TaskCreateResponse"];
                 };
             };
@@ -456,14 +541,18 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TaskCreateResponse"];
+                };
             };
             /** @description 服务端内部错误 */
             500: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TaskCreateResponse"];
+                };
             };
         };
     };
@@ -690,8 +779,8 @@ export interface operations {
                 page?: number;
                 /** @description 每页数量，范围 1-100 */
                 pagesize?: number;
-                /** @description 任务状态：0-初始化，1-运行中，3-成功，4-失败，6-已取消。 */
-                status?: 0 | 1 | 3 | 4 | 6;
+                /** @description 用于筛选的任务状态：0-初始化，1-运行中，3-成功，4-失败。省略时查询全部状态，结果中仍可能出现已取消状态 6。 */
+                status?: 0 | 1 | 3 | 4;
                 /** @description 创建时间起点，包含边界；Unix 毫秒时间戳 */
                 starttime?: number;
                 /** @description 创建时间终点，不包含边界；Unix 毫秒时间戳 */

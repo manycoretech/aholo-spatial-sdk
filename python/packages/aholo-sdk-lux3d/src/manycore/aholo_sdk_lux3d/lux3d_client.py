@@ -7,6 +7,7 @@ from manycore.aholo_sdk_core import AholoClientConfig, create_gateway_client
 from .resources.image_to_four_view import ImageToFourViewResource
 from .resources.img_to_3d import ImgTo3dResource, _file_to_data_url
 from .resources.material_transfer import MaterialTransferResource
+from .resources.multimodal_to_image import MultimodalToImageResource
 from .resources.multi_format_export import MultiFormatExportResource
 from .resources.tasks import TasksResource
 from .resources.text_to_3d import TextTo3dResource
@@ -20,6 +21,7 @@ class Lux3dClient:
         cfg = config or AholoClientConfig()
         gateway = create_gateway_client(cfg)
         region: str = cfg.region or "cn"
+        self.multimodal_to_image = MultimodalToImageResource(gateway, region)
         self.image_to_four_view = ImageToFourViewResource(gateway, region)
         self.img_to_3d = ImgTo3dResource(gateway, region)
         self.text_to_3d = TextTo3dResource(gateway, region)

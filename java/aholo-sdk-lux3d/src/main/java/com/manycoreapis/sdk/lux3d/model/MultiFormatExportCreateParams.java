@@ -12,7 +12,7 @@ import java.util.Optional;
 /** Parameters for creating a multi-format export task. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class MultiFormatExportCreateParams {
-    private static final List<String> OUTPUT_FORMATS = Arrays.asList("usdz", "obj_zip", "fbx_zip");
+    private static final List<String> OUTPUT_FORMATS = Arrays.asList("usdz", "obj_zip", "fbx_zip", "stl", "3mf");
     @JsonProperty("modelUrl") private final String modelUrl;
     @JsonProperty("outputFormat") private final List<String> outputFormat;
 
@@ -34,7 +34,7 @@ public final class MultiFormatExportCreateParams {
             Objects.requireNonNull(modelUrl, "modelUrl is required");
             if (modelUrl.trim().isEmpty()) throw new IllegalArgumentException("modelUrl must not be empty");
             if (outputFormat != null && !OUTPUT_FORMATS.containsAll(outputFormat)) {
-                throw new IllegalArgumentException("outputFormat supports usdz, obj_zip, and fbx_zip");
+                throw new IllegalArgumentException("outputFormat supports usdz, obj_zip, fbx_zip, stl, and 3mf");
             }
             String path = modelUrl.toLowerCase(Locale.ROOT).split("[?#]", 2)[0];
             if (path.endsWith(".glb") && (outputFormat == null || outputFormat.isEmpty())) {
