@@ -9,12 +9,16 @@ import com.manycoreapis.sdk.lux3d.model.TaskListParams;
 import com.manycoreapis.sdk.lux3d.model.TaskPagedList;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class NewApisTest {
     @Test
@@ -46,6 +50,24 @@ final class NewApisTest {
         ImageToFourViewCreateParams combined = (ImageToFourViewCreateParams) gateway.body;
         assertEquals("https://example.com/image.png", combined.img().get());
         assertEquals("keep the viewpoint", combined.prompt().get());
+    }
+
+    @Test
+    void imageToFourViewCreateFromFileEncodesLocalImage() throws Exception {
+        Path file = Files.createTempFile("four-view", ".png");
+        try {
+            Files.write(file, "png".getBytes(StandardCharsets.UTF_8));
+            FakeGateway gateway = new FakeGateway();
+            long taskId = new ImageToFourViewResource(gateway, "/lux3d/v1").createFromFile(
+                    file,
+                    ImageToFourViewCreateParams.builder().prompt("keep the viewpoint").build());
+            assertEquals(42L, taskId);
+            ImageToFourViewCreateParams body = (ImageToFourViewCreateParams) gateway.body;
+            assertTrue(body.img().get().startsWith("data:"));
+            assertEquals("keep the viewpoint", body.prompt().get());
+        } finally {
+            Files.deleteIfExists(file);
+        }
     }
 
     @Test
