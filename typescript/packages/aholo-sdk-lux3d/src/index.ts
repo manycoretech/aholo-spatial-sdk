@@ -1,9 +1,14 @@
 export { createLux3dClient, Lux3dClient } from './lux3d-client.js';
+export { HUMANOID_ANIMATION_IDS, type HumanoidAnimationId } from './humanoid-animations.js';
 export { ImageToFourViewResource } from './resources/image-to-four-view.js';
 export { ImgTo3dResource } from './resources/img-to-3d.js';
 export { MultimodalToImageResource } from './resources/multimodal-to-image.js';
 export { MaterialTransferResource } from './resources/material-transfer.js';
 export { MultiFormatExportResource } from './resources/multi-format-export.js';
+export { PartSplitResource } from './resources/part-split.js';
+export { ArticulationAnimationResource } from './resources/articulation-animation.js';
+export { HumanoidAutoRigResource } from './resources/humanoid-auto-rig.js';
+export { HumanoidAnimationRetargetResource } from './resources/humanoid-animation-retarget.js';
 export { TasksResource } from './resources/tasks.js';
 export { TextTo3dResource } from './resources/text-to-3d.js';
 export { bufferToDataUrl, fileToDataUrl, guessMimeType } from './image.js';
@@ -26,6 +31,12 @@ export {
   type MaterialTransferRequest,
   type MultiFormatExportOutputFormat,
   type MultiFormatExportRequest,
+  type PartSplitRequest,
+  type ArticulationAnimationRequest,
+  type HumanoidAnimationOutFormat,
+  type HumanoidAnimationOutputMode,
+  type HumanoidAnimationRetargetRequest,
+  type HumanoidAutoRigRequest,
   type TaskCreateResponse,
   type TaskOutput,
   type TaskQueryData,

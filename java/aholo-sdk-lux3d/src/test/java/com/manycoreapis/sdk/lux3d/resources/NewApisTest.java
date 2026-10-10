@@ -2,9 +2,13 @@ package com.manycoreapis.sdk.lux3d.resources;
 
 import com.manycoreapis.sdk.core.AholoClientConfig;
 import com.manycoreapis.sdk.core.AholoGatewayClient;
+import com.manycoreapis.sdk.lux3d.model.ArticulationAnimationCreateParams;
+import com.manycoreapis.sdk.lux3d.model.HumanoidAnimationRetargetCreateParams;
+import com.manycoreapis.sdk.lux3d.model.HumanoidAutoRigCreateParams;
 import com.manycoreapis.sdk.lux3d.model.ImageToFourViewCreateParams;
 import com.manycoreapis.sdk.lux3d.model.MultimodalToImageCreateParams;
 import com.manycoreapis.sdk.lux3d.model.MultiFormatExportCreateParams;
+import com.manycoreapis.sdk.lux3d.model.PartSplitCreateParams;
 import com.manycoreapis.sdk.lux3d.model.TaskListParams;
 import com.manycoreapis.sdk.lux3d.model.TaskPagedList;
 import org.junit.jupiter.api.Test;
@@ -123,6 +127,34 @@ final class NewApisTest {
     void glbExportRequiresOutputFormat() {
         assertThrows(IllegalArgumentException.class, () -> MultiFormatExportCreateParams.builder()
                 .modelUrl("https://example.com/model.glb").build());
+    }
+
+    @Test
+    void partSplitArticulationRigAndRetargetUseExpectedEndpoints() {
+        FakeGateway gateway = new FakeGateway();
+        assertEquals(42L, new PartSplitResource(gateway, "/lux3d/v1").create(
+                PartSplitCreateParams.builder().glbUrl("https://example.com/model.glb").build()));
+        assertEquals("/lux3d/v1/part-split/task/create", gateway.path);
+        assertEquals(42L, new ArticulationAnimationResource(gateway, "/global/lux3d/v1").create(
+                ArticulationAnimationCreateParams.builder()
+                        .glbUrl("https://example.com/model.glb")
+                        .prompt("open the lid")
+                        .build()));
+        assertEquals("/global/lux3d/v1/articulation-animation/task/create", gateway.path);
+        assertEquals(42L, new HumanoidAutoRigResource(gateway, "/lux3d/v1").create(
+                HumanoidAutoRigCreateParams.builder().modelUrl("https://example.com/model.glb").build()));
+        assertEquals("/lux3d/v1/animations/rig/task/create", gateway.path);
+        assertEquals(42L, new HumanoidAnimationRetargetResource(gateway, "/lux3d/v1").create(
+                HumanoidAnimationRetargetCreateParams.builder()
+                        .rigModelUrl("https://example.com/rig.glb")
+                        .animationIds(Arrays.asList("Idle_Loop", "Walk_Loop"))
+                        .outFormat("fbx")
+                        .build()));
+        assertEquals("/lux3d/v1/animations/retarget/task/create", gateway.path);
+        assertThrows(IllegalArgumentException.class, () -> HumanoidAnimationRetargetCreateParams.builder()
+                .rigModelUrl("https://example.com/rig.glb")
+                .animationIds(Arrays.asList("NotAnAction"))
+                .build());
     }
 
     private static final class FakeGateway extends AholoGatewayClient {

@@ -85,6 +85,28 @@ await lux3d.materialTransfer.create({
 });
 ```
 
+## Part split, articulation, rig, and retarget
+
+```typescript
+await lux3d.partSplit.create({ glbUrl: 'https://example.com/model.glb' });
+
+await lux3d.articulationAnimation.create({
+  glbUrl: 'https://example.com/model.glb',
+  prompt: 'The lid opens upward',
+});
+
+await lux3d.humanoidAutoRig.create({ modelUrl: 'https://example.com/human.glb' });
+
+await lux3d.humanoidAnimationRetarget.create({
+  rigModelUrl: 'https://example.com/rig.glb',
+  animationIds: ['Idle_Loop', 'Walk_Loop'],
+  animationOutputMode: 'separate',
+  outFormat: 'glb',
+});
+```
+
+`animationIds` accepts 1–10 unique preset ids. `animationOutputMode` is `separate` or `combined`; `outFormat` is `glb` or `fbx`.
+
 ## Multi-format export
 
 ```typescript

@@ -1,7 +1,7 @@
 {
   "name": "@manycore/aholo-sdk-lux3d",
-  "version": "1.7.0",
-  "description": "Aholo Lux3D generation, material transfer, export, and task history client",
+  "version": "1.8.0",
+  "description": "Aholo Lux3D generation, material transfer, part split, articulation, humanoid animation, export, and task history client",
   "license": "MIT",
   "repository": {
     "type": "git",
