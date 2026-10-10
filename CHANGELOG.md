@@ -5,6 +5,13 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Lux3D 1.8.0] - 2026-10-13
+
+### Added
+
+- Part split (`partSplit` / `part_split`), articulation and animation (`articulationAnimation` / `articulation_animation`), humanoid auto-rig (`humanoidAutoRig` / `humanoid_auto_rig`), and humanoid animation retarget (`humanoidAnimationRetarget` / `humanoid_animation_retarget`) across TypeScript, Java, and Python (sync/async).
+- Bumped all three Lux3D SDK packages to **1.8.0**.
+
 ## [Lux3D 1.7.0] - 2026-09-08
 
 ### Added
@@ -142,6 +149,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Repository initialized.
 
+[Lux3D 1.8.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.7.0...lux3d/v1.8.0
 [lux3d-1.7.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.6.0...lux3d/v1.7.0
 [lux3d-1.6.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.5.0...lux3d/v1.6.0
 [lux3d-1.5.0]: https://github.com/manycoretech/aholo-spatial-sdk/compare/lux3d/v1.4.0...lux3d/v1.5.0

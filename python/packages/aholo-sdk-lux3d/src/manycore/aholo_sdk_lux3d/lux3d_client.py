@@ -4,11 +4,15 @@ from typing import Optional
 
 from manycore.aholo_sdk_core import AholoClientConfig, create_gateway_client
 
+from .resources.articulation_animation import ArticulationAnimationResource
+from .resources.humanoid_animation_retarget import HumanoidAnimationRetargetResource
+from .resources.humanoid_auto_rig import HumanoidAutoRigResource
 from .resources.image_to_four_view import ImageToFourViewResource
 from .resources.img_to_3d import ImgTo3dResource, _file_to_data_url
 from .resources.material_transfer import MaterialTransferResource
 from .resources.multimodal_to_image import MultimodalToImageResource
 from .resources.multi_format_export import MultiFormatExportResource
+from .resources.part_split import PartSplitResource
 from .resources.tasks import TasksResource
 from .resources.text_to_3d import TextTo3dResource
 
@@ -27,6 +31,10 @@ class Lux3dClient:
         self.text_to_3d = TextTo3dResource(gateway, region)
         self.material_transfer = MaterialTransferResource(gateway, region)
         self.multi_format_export = MultiFormatExportResource(gateway, region)
+        self.part_split = PartSplitResource(gateway, region)
+        self.articulation_animation = ArticulationAnimationResource(gateway, region)
+        self.humanoid_auto_rig = HumanoidAutoRigResource(gateway, region)
+        self.humanoid_animation_retarget = HumanoidAnimationRetargetResource(gateway, region)
         self.tasks = TasksResource(gateway, region)
 
 

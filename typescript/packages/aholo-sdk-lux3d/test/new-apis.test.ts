@@ -3,10 +3,14 @@ import test from 'node:test';
 
 import type { AholoGatewayClient } from '@manycore/aholo-sdk-core';
 
+import { ArticulationAnimationResource } from '../src/resources/articulation-animation.js';
+import { HumanoidAnimationRetargetResource } from '../src/resources/humanoid-animation-retarget.js';
+import { HumanoidAutoRigResource } from '../src/resources/humanoid-auto-rig.js';
 import { ImageToFourViewResource } from '../src/resources/image-to-four-view.js';
 import { ImgTo3dResource } from '../src/resources/img-to-3d.js';
 import { MultimodalToImageResource } from '../src/resources/multimodal-to-image.js';
 import { MultiFormatExportResource } from '../src/resources/multi-format-export.js';
+import { PartSplitResource } from '../src/resources/part-split.js';
 import { TasksResource } from '../src/resources/tasks.js';
 
 function taskGateway(requests: unknown[]): AholoGatewayClient {
@@ -85,6 +89,53 @@ test('multi format export accepts stl and 3mf', async () => {
   const body = { modelUrl: 'https://example.com/model.glb', outputFormat: ['stl', '3mf'] as const };
   assert.equal(await resource.create(body), 42);
   assert.deepEqual((requests[0] as { body: unknown }).body, body);
+});
+
+test('part split posts glbUrl to the China endpoint', async () => {
+  const requests: unknown[] = [];
+  const resource = new PartSplitResource(taskGateway(requests), 'cn');
+  const body = { glbUrl: 'https://example.com/model.glb' };
+  assert.equal(await resource.create(body), 42);
+  assert.deepEqual(requests[0], {
+    method: 'POST',
+    path: '/lux3d/v1/part-split/task/create',
+    body,
+    signal: undefined,
+  });
+});
+
+test('articulation animation requires glbUrl and prompt', async () => {
+  const requests: unknown[] = [];
+  const resource = new ArticulationAnimationResource(taskGateway(requests), 'com');
+  const body = { glbUrl: 'https://example.com/model.glb', prompt: 'open the lid' };
+  assert.equal(await resource.create(body), 42);
+  assert.deepEqual((requests[0] as { path: string }).path, '/global/lux3d/v1/articulation-animation/task/create');
+  await assert.rejects(() => resource.create({ glbUrl: 'https://example.com/model.glb', prompt: '   ' }), /prompt/);
+});
+
+test('humanoid auto rig posts modelUrl', async () => {
+  const requests: unknown[] = [];
+  const resource = new HumanoidAutoRigResource(taskGateway(requests), 'cn');
+  assert.equal(await resource.create({ modelUrl: 'https://example.com/model.glb' }), 42);
+  assert.deepEqual((requests[0] as { path: string }).path, '/lux3d/v1/animations/rig/task/create');
+});
+
+test('humanoid retarget rejects unknown animation ids', async () => {
+  const requests: unknown[] = [];
+  const resource = new HumanoidAnimationRetargetResource(taskGateway(requests), 'cn');
+  const body = {
+    rigModelUrl: 'https://example.com/rig.glb',
+    animationIds: ['Idle_Loop', 'Walk_Loop'] as const,
+    animationOutputMode: 'combined' as const,
+    outFormat: 'fbx' as const,
+    animateInPlace: true,
+  };
+  assert.equal(await resource.create(body), 42);
+  assert.deepEqual((requests[0] as { body: unknown }).body, body);
+  await assert.rejects(
+    () => resource.create({ rigModelUrl: 'https://example.com/rig.glb', animationIds: ['NotAnAction'] }),
+    /animationIds/,
+  );
 });
 
 test('image to 3D enforces exactly one image input at runtime', async () => {

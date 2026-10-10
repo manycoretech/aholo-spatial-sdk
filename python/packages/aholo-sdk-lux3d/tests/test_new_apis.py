@@ -1,6 +1,9 @@
 import asyncio
 import unittest
 
+from manycore.aholo_sdk_lux3d.resources.articulation_animation import ArticulationAnimationResource
+from manycore.aholo_sdk_lux3d.resources.humanoid_animation_retarget import HumanoidAnimationRetargetResource
+from manycore.aholo_sdk_lux3d.resources.humanoid_auto_rig import HumanoidAutoRigResource
 from manycore.aholo_sdk_lux3d.resources.image_to_four_view import (
     AsyncImageToFourViewResource, ImageToFourViewResource,
 )
@@ -11,6 +14,7 @@ from manycore.aholo_sdk_lux3d.resources.multimodal_to_image import (
 from manycore.aholo_sdk_lux3d.resources.multi_format_export import (
     AsyncMultiFormatExportResource, MultiFormatExportResource,
 )
+from manycore.aholo_sdk_lux3d.resources.part_split import PartSplitResource
 from manycore.aholo_sdk_lux3d.resources.tasks import AsyncTasksResource, TasksResource
 
 
@@ -110,6 +114,27 @@ class NewApisTest(unittest.TestCase):
         self.assertEqual(3, gateway.requests[1]["query"]["status"])
         with self.assertRaises(ValueError):
             tasks.list(status=6)
+
+    def test_part_split_and_motion_apis(self):
+        gateway = FakeGateway()
+        task_id = PartSplitResource(gateway, "cn").create(glb_url="https://example.com/model.glb")
+        self.assertEqual(42, task_id)
+        self.assertEqual("/lux3d/v1/part-split/task/create", gateway.requests[0]["path"])
+        ArticulationAnimationResource(gateway, "com").create(
+            glb_url="https://example.com/model.glb", prompt="open the lid")
+        self.assertEqual(
+            "/global/lux3d/v1/articulation-animation/task/create", gateway.requests[1]["path"])
+        HumanoidAutoRigResource(gateway, "cn").create(model_url="https://example.com/model.glb")
+        self.assertEqual("/lux3d/v1/animations/rig/task/create", gateway.requests[2]["path"])
+        HumanoidAnimationRetargetResource(gateway, "cn").create(
+            rig_model_url="https://example.com/rig.glb",
+            animation_ids=["Idle_Loop", "Walk_Loop"],
+            out_format="fbx",
+        )
+        self.assertEqual(["Idle_Loop", "Walk_Loop"], gateway.requests[3]["body"]["animationIds"])
+        with self.assertRaises(ValueError):
+            HumanoidAnimationRetargetResource(gateway, "cn").create(
+                rig_model_url="https://example.com/rig.glb", animation_ids=["NotAnAction"])
 
     def test_async_resources(self):
         async def run():

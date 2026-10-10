@@ -1,5 +1,6 @@
 // API model types — sourced from the OpenAPI spec via openapi-typescript.
 // Run `npm run generate` to refresh after spec changes.
+import type { HumanoidAnimationId } from './humanoid-animations.js';
 import type { components } from './generated/lux3d-api.js';
 
 // --- Request types (direct from spec) ---
@@ -17,6 +18,25 @@ export type ImageToFourViewRequest =
 export type TextTo3dRequest         = components['schemas']['TextTo3dRequest'];
 export type MaterialTransferRequest = components['schemas']['MaterialTransferRequest'];
 export type MultiFormatExportRequest = components['schemas']['MultiFormatExportRequest'];
+export interface PartSplitRequest {
+  glbUrl: string;
+}
+export interface ArticulationAnimationRequest {
+  glbUrl: string;
+  prompt: string;
+}
+export interface HumanoidAutoRigRequest {
+  modelUrl: string;
+}
+export type HumanoidAnimationOutputMode = 'separate' | 'combined';
+export type HumanoidAnimationOutFormat = 'glb' | 'fbx';
+export interface HumanoidAnimationRetargetRequest {
+  rigModelUrl: string;
+  animationIds: HumanoidAnimationId[];
+  animationOutputMode?: HumanoidAnimationOutputMode;
+  outFormat?: HumanoidAnimationOutFormat;
+  animateInPlace?: boolean;
+}
 
 // --- Response types (direct from spec) ---
 export type TaskCreateResponse = components['schemas']['TaskCreateResponse'];
