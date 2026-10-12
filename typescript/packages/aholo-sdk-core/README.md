@@ -1,6 +1,6 @@
 # @manycore/aholo-sdk-core
 
-Shared HTTP client, authentication, error types, and polling utilities for the [Aholo](https://labs.aholo3d.com) TypeScript SDKs.
+Shared HTTP client, authentication, error types, and polling utilities for the [Aholo](https://labs.aholo.ai) TypeScript SDKs.
 
 > This package is a peer dependency used internally by `@manycore/aholo-sdk-world`, `@manycore/aholo-sdk-lux3d`, and `@manycore/aholo-sdk-asset`. You typically do not need to install it directly.
 

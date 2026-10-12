@@ -14,17 +14,17 @@
         <dependency>
             <groupId>com.manycoreapis</groupId>
             <artifactId>aholo-sdk-asset</artifactId>
-            <version>1.2.0</version>
+            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.manycoreapis</groupId>
             <artifactId>aholo-sdk-lux3d</artifactId>
-            <version>1.8.0</version>
+            <version>1.9.0</version>
         </dependency>
         <dependency>
             <groupId>com.manycoreapis</groupId>
             <artifactId>aholo-sdk-world</artifactId>
-            <version>1.3.0</version>
+            <version>1.4.0</version>
         </dependency>
     </dependencies>
     <build>

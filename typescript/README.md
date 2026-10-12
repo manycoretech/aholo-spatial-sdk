@@ -2,9 +2,9 @@
 
 [中文文档](README.zh-CN.md)
 
-Official TypeScript/Node.js SDKs for the [Aholo](https://labs.aholo3d.com) Open API.
+Official TypeScript/Node.js SDKs for the [Aholo](https://labs.aholo.ai) Open API.
 
-> 📖 **Full documentation (canonical)**: [https://labs.aholo3d.com/api-docs/en/sdk/typescript](https://labs.aholo3d.com/api-docs/en/sdk/typescript)
+> 📖 **Full documentation (canonical)**: [https://labs.aholo.ai/api-docs/en/sdk/typescript](https://labs.aholo.ai/api-docs/en/sdk/typescript)
 
 **Requirements:** Node.js ≥ 18
 
@@ -33,20 +33,20 @@ npm install @manycore/aholo-sdk-world   # world reconstruction
 export AHOLO_API_KEY=your_api_key_here
 ```
 
-Apply for an API Key: [labs.aholo3d.cn](https://labs.aholo3d.cn) (China) · [labs.aholo3d.com](https://labs.aholo3d.com) (Global)
+Apply for an API Key: [labs.aholo3d.cn](https://labs.aholo3d.cn) (China) · [labs.aholo.ai](https://labs.aholo.ai) (Global)
 
 ## Region
 
 | Value | Description | Endpoint |
 |-------|-------------|----------|
 | `cn` | China | `https://api.aholo3d.cn` |
-| `com` | Global | `https://api.aholo3d.com` |
+| `com` | Global | `https://api.aholo.ai` |
 
-> API usage and error handling: see [full documentation](https://labs.aholo3d.com/api-docs/en/sdk/typescript).
+> API usage and error handling: see [full documentation](https://labs.aholo.ai/api-docs/en/sdk/typescript).
 
 ## Examples
 
-See [examples/](examples/) for runnable scripts. Run instructions are in each script or the [full documentation](https://labs.aholo3d.com/api-docs/en/sdk/typescript).
+See [examples/](examples/) for runnable scripts. Run instructions are in each script or the [full documentation](https://labs.aholo.ai/api-docs/en/sdk/typescript).
 
 - `world-reconstruct.mts` — `.mp4`/`.mov` (`video`) or Insta360 `.insv` (`insv`)
 

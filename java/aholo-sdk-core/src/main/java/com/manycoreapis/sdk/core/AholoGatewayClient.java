@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AholoGatewayClient extends BaseHttpClient {
-    public static final String DEFAULT_USER_AGENT = "aholo-sdk-core/1.2.0";
+    public static final String DEFAULT_USER_AGENT = "aholo-sdk-core/1.3.0";
     private final AholoClientConfig config;
 
     public AholoGatewayClient(AholoClientConfig config) {

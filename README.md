@@ -2,9 +2,9 @@
 
 [中文文档](README.zh-CN.md)
 
-Official SDKs for the [Aholo](https://labs.aholo3d.com) Open API — asset upload, Lux3D generation/export/task history, and 3DGS world reconstruction.
+Official SDKs for the [Aholo](https://labs.aholo.ai) Open API — asset upload, Lux3D generation/export/task history, and 3DGS world reconstruction.
 
-> 📖 **Full documentation (canonical)**: [https://labs.aholo3d.com/api-docs/en/sdk](https://labs.aholo3d.com/api-docs/en/sdk)
+> 📖 **Full documentation (canonical)**: [https://labs.aholo.ai/api-docs/en/sdk](https://labs.aholo.ai/api-docs/en/sdk)
 
 ## Packages
 
@@ -42,14 +42,14 @@ const asset = createAssetClient({ apiKey: 'your_api_key_here', region: 'com' });
 Apply for your API Key:
 
 - China: [https://labs.aholo3d.cn](https://labs.aholo3d.cn)
-- Global: [https://labs.aholo3d.com](https://labs.aholo3d.com)
+- Global: [https://labs.aholo.ai](https://labs.aholo.ai)
 
 ## Region
 
 | Value | Description | Endpoint |
 |-------|-------------|----------|
 | `cn` | China | `https://api.aholo3d.cn` |
-| `com` | Global | `https://api.aholo3d.com` |
+| `com` | Global | `https://api.aholo.ai` |
 
 ## Quick Start
 

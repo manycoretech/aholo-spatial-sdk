@@ -42,7 +42,7 @@ Include as much detail as possible:
 
 **Out of scope**
 
-- Vulnerabilities in the Aholo API backend itself (report via [Aholo support](https://labs.aholo3d.com))
+- Vulnerabilities in the Aholo API backend itself (report via [Aholo support](https://labs.aholo.ai))
 - Issues caused solely by misuse of API keys or insecure application code outside this SDK
 - Social engineering or denial-of-service against Aholo infrastructure
 

@@ -12,7 +12,7 @@ public class AholoClientConfig {
     public enum Region { CN, COM }
 
     public static final String DEFAULT_BASE_URL_CN = "https://api.aholo3d.cn";
-    public static final String DEFAULT_BASE_URL_GLOBAL = "https://api.aholo3d.com";
+    public static final String DEFAULT_BASE_URL_GLOBAL = "https://api.aholo.ai";
     public static final int DEFAULT_TIMEOUT_MS = 60_000;
 
     public AholoClientConfig(String apiKey, String baseUrl, Region region, int timeoutMs, String userAgent) {
