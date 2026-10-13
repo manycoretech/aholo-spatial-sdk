@@ -5,6 +5,14 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Core 1.3.0] - 2026-10-12
+
+### Changed
+
+- Global (`region=com`) default API base URL is now `https://api.aholo.ai`.
+- Bumped the core SDK packages to **1.3.0**.
+- Bumped asset to **1.3.0**, world to **1.4.0**, and Lux3D to **1.9.0**. These packages now depend on core **1.3.0**.
+
 ## [Lux3D 1.8.0] - 2026-10-13
 
 ### Added

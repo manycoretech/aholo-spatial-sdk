@@ -2,9 +2,9 @@
 
 [中文文档](README.zh-CN.md)
 
-Official Java SDKs for the [Aholo](https://labs.aholo3d.com) Open API.
+Official Java SDKs for the [Aholo](https://labs.aholo.ai) Open API.
 
-> 📖 **Full documentation (canonical)**: [https://labs.aholo3d.com/api-docs/en/sdk/java](https://labs.aholo3d.com/api-docs/en/sdk/java)
+> 📖 **Full documentation (canonical)**: [https://labs.aholo.ai/api-docs/en/sdk/java](https://labs.aholo.ai/api-docs/en/sdk/java)
 
 **Requirements:** Java 8+, Maven ≥ 3.6 (build with JDK 17 or 21 recommended)
 
@@ -47,20 +47,20 @@ Add the packages you need to your `pom.xml` (replace `LATEST_VERSION` with the v
 export AHOLO_API_KEY=your_api_key_here
 ```
 
-Apply for an API Key: [labs.aholo3d.cn](https://labs.aholo3d.cn) (China) · [labs.aholo3d.com](https://labs.aholo3d.com) (Global)
+Apply for an API Key: [labs.aholo3d.cn](https://labs.aholo3d.cn) (China) · [labs.aholo.ai](https://labs.aholo.ai) (Global)
 
 ## Region
 
 | Value | Description | Endpoint |
 |-------|-------------|----------|
 | `cn` | China | `https://api.aholo3d.cn` |
-| `com` | Global | `https://api.aholo3d.com` |
+| `com` | Global | `https://api.aholo.ai` |
 
-> API usage and error handling: see [full documentation](https://labs.aholo3d.com/api-docs/en/sdk/java).
+> API usage and error handling: see [full documentation](https://labs.aholo.ai/api-docs/en/sdk/java).
 
 ## Examples
 
-See [examples/](examples/) for runnable Java classes. Run instructions are in the [full documentation](https://labs.aholo3d.com/api-docs/en/sdk/java).
+See [examples/](examples/) for runnable Java classes. Run instructions are in the [full documentation](https://labs.aholo.ai/api-docs/en/sdk/java).
 
 - `WorldReconstruct` — `.mp4`/`.mov` (`video`) or Insta360 `.insv` (`insv`); generation uses `GenerateWorldResource`
 

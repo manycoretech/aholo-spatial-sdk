@@ -5,7 +5,7 @@ from typing import Any, Mapping, Optional
 from .config import AholoClientConfig, resolve_api_key, resolve_base_url
 from .http import AsyncBaseHttpClient, BaseHttpClient
 
-DEFAULT_USER_AGENT = "aholo-sdk-core/1.2.0"
+DEFAULT_USER_AGENT = "aholo-sdk-core/1.3.0"
 
 
 class AholoGatewayClient(BaseHttpClient):

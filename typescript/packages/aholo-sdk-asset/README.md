@@ -1,6 +1,6 @@
 # @manycore/aholo-sdk-asset
 
-Official TypeScript/Node.js SDK for [Aholo](https://labs.aholo3d.com) — file upload client (single & multipart, resume support).
+Official TypeScript/Node.js SDK for [Aholo](https://labs.aholo.ai) — file upload client (single & multipart, resume support).
 
 **Requirements:** Node.js ≥ 18
 

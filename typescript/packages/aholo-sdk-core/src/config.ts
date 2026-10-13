@@ -16,7 +16,7 @@ export interface AholoClientConfig {
 }
 
 export const DEFAULT_BASE_URL_CN = 'https://api.aholo3d.cn';
-export const DEFAULT_BASE_URL_GLOBAL = 'https://api.aholo3d.com';
+export const DEFAULT_BASE_URL_GLOBAL = 'https://api.aholo.ai';
 
 export const DEFAULT_TIMEOUT_MS = 60_000;
 

@@ -2,9 +2,9 @@
 
 [中文文档](README.zh-CN.md)
 
-Official Python SDKs for the [Aholo](https://labs.aholo3d.com) Open API.
+Official Python SDKs for the [Aholo](https://labs.aholo.ai) Open API.
 
-> 📖 **Full documentation (canonical)**: [https://labs.aholo3d.com/api-docs/en/sdk/python](https://labs.aholo3d.com/api-docs/en/sdk/python)
+> 📖 **Full documentation (canonical)**: [https://labs.aholo.ai/api-docs/en/sdk/python](https://labs.aholo.ai/api-docs/en/sdk/python)
 
 **Requirements:** Python ≥ 3.9
 
@@ -35,20 +35,20 @@ For local development, install editable from source — see [examples/](examples
 export AHOLO_API_KEY=your_api_key_here
 ```
 
-Apply for an API Key: [labs.aholo3d.cn](https://labs.aholo3d.cn) (China) · [labs.aholo3d.com](https://labs.aholo3d.com) (Global)
+Apply for an API Key: [labs.aholo3d.cn](https://labs.aholo3d.cn) (China) · [labs.aholo.ai](https://labs.aholo.ai) (Global)
 
 ## Region
 
 | Value | Description | Endpoint |
 |-------|-------------|----------|
 | `cn` | China | `https://api.aholo3d.cn` |
-| `com` | Global | `https://api.aholo3d.com` |
+| `com` | Global | `https://api.aholo.ai` |
 
-> API usage and error handling: see [full documentation](https://labs.aholo3d.com/api-docs/en/sdk/python).
+> API usage and error handling: see [full documentation](https://labs.aholo.ai/api-docs/en/sdk/python).
 
 ## Examples
 
-See [examples/](examples/) for runnable scripts. Run instructions are in the [full documentation](https://labs.aholo3d.com/api-docs/en/sdk/python).
+See [examples/](examples/) for runnable scripts. Run instructions are in the [full documentation](https://labs.aholo.ai/api-docs/en/sdk/python).
 
 - `world_reconstruct.py` — `.mp4`/`.mov` (`video`) or Insta360 `.insv` (`insv`)
 

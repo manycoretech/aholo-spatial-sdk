@@ -7,7 +7,7 @@ from typing import Literal, Optional
 AholoRegion = Literal["cn", "com"]
 
 DEFAULT_BASE_URL_CN = "https://api.aholo3d.cn"
-DEFAULT_BASE_URL_GLOBAL = "https://api.aholo3d.com"
+DEFAULT_BASE_URL_GLOBAL = "https://api.aholo.ai"
 DEFAULT_TIMEOUT_MS = 60_000
 
 

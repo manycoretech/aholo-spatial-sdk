@@ -47,14 +47,14 @@
 export AHOLO_API_KEY=your_api_key_here
 ```
 
-API Key 申请：[labs.aholo3d.cn](https://labs.aholo3d.cn)（中国区）· [labs.aholo3d.com](https://labs.aholo3d.com)（海外区）
+API Key 申请：[labs.aholo3d.cn](https://labs.aholo3d.cn)（中国区）· [labs.aholo.ai](https://labs.aholo.ai)（海外区）
 
 ## 区域
 
 | 值 | 说明 | 接入点 |
 |----|------|--------|
 | `cn` | 中国区 | `https://api.aholo3d.cn` |
-| `com` | 海外区 | `https://api.aholo3d.com` |
+| `com` | 海外区 | `https://api.aholo.ai` |
 
 > API 用法与错误处理见 [完整文档](https://labs.aholo3d.cn/api-docs/sdk/java)。
 

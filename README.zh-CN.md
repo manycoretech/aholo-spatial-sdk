@@ -40,14 +40,14 @@ const asset = createAssetClient({ apiKey: 'your_api_key_here', region: 'cn' });
 API Key 申请地址：
 
 - 中国区：[https://labs.aholo3d.cn](https://labs.aholo3d.cn)
-- 海外区：[https://labs.aholo3d.com](https://labs.aholo3d.com)
+- 海外区：[https://labs.aholo.ai](https://labs.aholo.ai)
 
 ## 区域
 
 | 值 | 说明 | 接入点 |
 |----|------|--------|
 | `cn` | 中国区 | `https://api.aholo3d.cn` |
-| `com` | 海外区 | `https://api.aholo3d.com` |
+| `com` | 海外区 | `https://api.aholo.ai` |
 
 ## 快速开始
 

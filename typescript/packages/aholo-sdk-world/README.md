@@ -1,6 +1,6 @@
 # @manycore/aholo-sdk-world
 
-Official TypeScript/Node.js SDK for [Aholo](https://labs.aholo3d.com) World — 3DGS world reconstruction and generation.
+Official TypeScript/Node.js SDK for [Aholo](https://labs.aholo.ai) World — 3DGS world reconstruction and generation.
 
 **Requirements:** Node.js ≥ 18
 
